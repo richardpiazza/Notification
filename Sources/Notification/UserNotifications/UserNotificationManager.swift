@@ -6,7 +6,7 @@ import UserNotifications
 
 open class UserNotificationManager: NSObject, NotificationManager {
     
-    static let logger = Logger(label: "UserNotificationManager")
+    static let logger = Logger(label: "package.notification")
     
     internal let userNotificationCenter: UNUserNotificationCenter = .current()
     
