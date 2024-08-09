@@ -1,5 +1,3 @@
-import Foundation
-
 public enum Traffic {
     case silent(Payload)
     case presented(Payload)

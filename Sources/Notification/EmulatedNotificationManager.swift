@@ -1,7 +1,6 @@
 import Foundation
 import Combine
 import Harness
-import Notification
 
 open class EmulatedNotificationManager: NotificationManager {
     

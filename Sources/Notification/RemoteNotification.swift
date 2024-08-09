@@ -1,5 +1,3 @@
-import Foundation
-
 public protocol RemoteNotification {
     /// Apple Push Service content payload.
     var aps: APS { get }

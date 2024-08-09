@@ -16,17 +16,15 @@ public extension UserNotification {
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
-
-public extension UNNotificationCategory {
-    convenience init(_ category: UserNotification.Category) {
-        self.init(
-            identifier: category.id,
-            actions: category.actions.map { UNNotificationAction($0) },
-            intentIdentifiers: [],
-            options: .init()
-        )
+extension UserNotification.Category: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification.Category {
+          id: \(id)
+          actions: [
+            \(actions.map(\.debugDescription))
+          ]
+        }
+        """
     }
 }
-#endif

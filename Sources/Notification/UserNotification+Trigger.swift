@@ -2,10 +2,12 @@ import Foundation
 #if canImport(UserNotifications)
 import UserNotifications
 
+@available(*, deprecated)
 public protocol NotificationTriggerConvertible {
     var unNotificationTrigger: UNNotificationTrigger { get }
 }
 
+@available(*, deprecated)
 public struct AnyNotificationTriggerConvertible: NotificationTriggerConvertible {
     public let unNotificationTrigger: UNNotificationTrigger
     
@@ -23,6 +25,7 @@ public extension UserNotification {
             case timeInterval(TimeInterval)
             case calendar(DateComponents)
             #if canImport(UserNotifications)
+            @available(*, deprecated)
             case convertible(NotificationTriggerConvertible)
             #endif
         }
@@ -40,25 +43,30 @@ public extension UserNotification {
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
+extension UserNotification.Trigger: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification.Trigger {
+          event: \(event?.debugDescription ?? "NIL")
+          repeats: \(repeats ? "YES" : "NO")
+        }
+        """
+    }
+}
 
-public extension UNNotificationTrigger {
-    var trigger: UserNotification.Trigger {
+extension UserNotification.Trigger.Event: CustomDebugStringConvertible {
+    public var debugDescription: String {
         switch self {
-        #if !os(macOS)
-        case let value as UNLocationNotificationTrigger:
-            return UserNotification.Trigger(event: .convertible(AnyNotificationTriggerConvertible(value)), repeats: value.repeats)
+        case .push:
+            return "UserNotification.Trigger.Event { Push }"
+        case .timeInterval(let timeInterval):
+            return "UserNotification.Trigger.Event { Time Interval - \(timeInterval) }"
+        case .calendar(let dateComponents):
+            return "UserNotification.Trigger.Event { Date Components - \(dateComponents) }"
+        #if canImport(UserNotifications)
+        case .convertible(_):
+            return "UserNotification.Trigger.Event { <DEPRECATED> }"
         #endif
-        case let value as UNCalendarNotificationTrigger:
-            return UserNotification.Trigger(event: .calendar(value.dateComponents), repeats: value.repeats)
-        case let value as UNTimeIntervalNotificationTrigger:
-            return UserNotification.Trigger(event: .timeInterval(value.timeInterval), repeats: value.repeats)
-        case let value as UNPushNotificationTrigger:
-            return UserNotification.Trigger(event: .push, repeats: value.repeats)
-        default:
-            return UserNotification.Trigger(repeats: repeats)
         }
     }
 }
-#endif
