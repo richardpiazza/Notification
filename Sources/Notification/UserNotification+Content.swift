@@ -1,5 +1,3 @@
-import Foundation
-
 public extension UserNotification {
     struct Content {
         /// Optional array of attachments.
@@ -53,48 +51,23 @@ public extension UserNotification {
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
-
-public extension UNNotificationContent {
-    var content: UserNotification.Content {
-        #if os(macOS)
-        let imageName = ""
-        #else
-        let imageName = launchImageName
-        #endif
-        
-        return UserNotification.Content(
-            attachments: attachments.map { UserNotification.Attachment($0) },
-            badge: badge?.intValue,
-            body: body,
-            categoryId: categoryIdentifier,
-            launchImageName: imageName,
-            sound: nil,
-            subtitle: subtitle,
-            threadIdentifier: threadIdentifier,
-            title: title,
-            payload: userInfo
-        )
+extension UserNotification.Content: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification.Content {
+          attachments: [
+            \(attachments.map(\.debugDescription))
+          ]
+          badge: \(badge?.description ?? "NIL")
+          body: \(body)
+          categoryId: \(categoryId)
+          launchImageName: \(launchImageName)
+          sound: \(sound?.debugDescription ?? "NIL")
+          subtitle: \(subtitle)
+          threadIdentifier: \(threadIdentifier)
+          title: \(title)
+          payload: \(payload.debugDescription)
+        }
+        """
     }
 }
-
-public extension UserNotification.Content {
-    init(_ content: UNNotificationContent) {
-        attachments = content.attachments.map { UserNotification.Attachment($0) }
-        badge = content.badge?.intValue
-        body = content.body
-        categoryId = content.categoryIdentifier
-        #if os(macOS)
-        launchImageName = ""
-        #else
-        launchImageName = content.launchImageName
-        #endif
-        sound = nil
-        subtitle = content.subtitle
-        threadIdentifier = content.threadIdentifier
-        title = content.title
-        payload = content.userInfo
-    }
-}
-#endif

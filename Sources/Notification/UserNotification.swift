@@ -6,20 +6,20 @@ public struct UserNotification {
     
     public init(
         date: Date = Date(),
-        request: Request = .init()
+        request: Request = Request()
     ) {
         self.date = date
         self.request = request
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
-
-public extension UserNotification {
-    init(_ notification: UNNotification) {
-        date = notification.date
-        request = .init()
+extension UserNotification: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification {
+          date: \(date.debugDescription)
+          request: \(request.debugDescription)
+        }
+        """
     }
 }
-#endif

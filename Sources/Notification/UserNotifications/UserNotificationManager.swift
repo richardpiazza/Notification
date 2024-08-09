@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(Combine)
 import Combine
+#endif
 import Logging
 #if canImport(UserNotifications)
 import UserNotifications
@@ -14,12 +16,12 @@ open class UserNotificationManager: NSObject, NotificationManager {
     public var authorization: AuthorizationStatus { authorizationSubject.value }
     public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
     public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
-    public var trafficPublisher: AnyPublisher<Traffic, Never> { userNotificationsSubject.eraseToAnyPublisher() }
+    public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
     
     private var notificationSettings: UNNotificationSettings?
     private var authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never> = .init(.notDetermined)
     private var apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
-    private var userNotificationsSubject: PassthroughSubject<Traffic, Never> = .init()
+    private var trafficSubject: PassthroughSubject<Traffic, Never> = .init()
     private var redactions: [String]
     
     /// Initialize a `UserNotificationManager`.
@@ -69,13 +71,13 @@ open class UserNotificationManager: NSObject, NotificationManager {
     
     public func didReceiveRemoteNotification(_ content: Payload) async throws -> Bool {
         Self.logger.debug("User Notification - Silent: \(content.json(redacting: redactions))")
-        userNotificationsSubject.send(.silent(content))
+        trafficSubject.send(.silent(content))
         return true
     }
     
     public func localNotificationRequest(_ request: UserNotification.Request) throws {
         var _error: Error?
-        userNotificationCenter.add(request.unNotificationRequest) { error in
+        userNotificationCenter.add(UNNotificationRequest.make(with: request)) { error in
             _error = error
         }
         if let error = _error {
@@ -109,7 +111,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let content = notification.request.content.userInfo
         Self.logger.debug("User Notification - Presenting: \(content.json(redacting: redactions))")
-        userNotificationsSubject.send(.presented(content))
+        trafficSubject.send(.presented(content))
         
         DispatchQueue.main.async {
             completionHandler(UNNotificationPresentationOptions([.list, .banner, .sound, .badge]))
@@ -130,7 +132,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
         }
         
         Self.logger.debug("User Notification - Interacted: \(content.json(redacting: redactions)) \(action)")
-        userNotificationsSubject.send(.interacted(content, action))
+        trafficSubject.send(.interacted(content, action))
         
         DispatchQueue.main.async {
             completionHandler()
@@ -142,7 +144,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
 private extension UserNotificationManager {
     /// Register any custom actions that can be displayed with notifications.
     func registerCategoriesAndActions() {
-        let notificationCategories = categories.map { UNNotificationCategory($0) }
+        let notificationCategories = categories.map { UNNotificationCategory.make(with: $0) }
         userNotificationCenter.setNotificationCategories(Set(notificationCategories))
     }
     
@@ -153,7 +155,7 @@ private extension UserNotificationManager {
             }
             
             self.notificationSettings = notificationSettings
-            self.authorizationSubject.send(AuthorizationStatus(authorizationStatus: notificationSettings.authorizationStatus))
+            self.authorizationSubject.send(AuthorizationStatus.make(with: notificationSettings.authorizationStatus))
         }
     }
 }

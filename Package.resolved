@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
+      "identity" : "asyncplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/richardpiazza/AsyncPlus",
+      "state" : {
+        "revision" : "4e7b506142c6a268b2adac12b405615320bb04c8",
+        "version" : "0.3.1"
+      }
+    },
+    {
       "identity" : "harness",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/richardpiazza/Harness.git",
       "state" : {
-        "revision" : "5cadd677550b3aaf7a21739b2cc1f207726b84a2",
-        "version" : "1.0.0"
+        "revision" : "0fffad21894b52349c84dfdccb7e31e07019655f",
+        "version" : "1.2.0"
       }
     },
     {
@@ -14,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
-        "version" : "1.5.2"
+        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
+        "version" : "1.6.1"
       }
     }
   ],

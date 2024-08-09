@@ -1,7 +1,6 @@
 import XCTest
 import Combine
 @testable import Notification
-import NotificationEmulation
 
 final class NotificationManagerTests: XCTestCase {
     

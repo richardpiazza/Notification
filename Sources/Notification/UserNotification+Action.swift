@@ -30,6 +30,7 @@ public extension UserNotification {
 }
 
 extension UserNotification.Action: CustomStringConvertible {
+    @available(*, deprecated, renamed: "debugDescription")
     public var description: String {
         """
         UserNotification.Action {
@@ -43,32 +44,16 @@ extension UserNotification.Action: CustomStringConvertible {
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
-
-public extension UserNotification.Action {
-    static let `default`: Self = .init(id: UNNotificationDefaultActionIdentifier)
-    static let dismiss: Self = .init(id: UNNotificationDismissActionIdentifier)
-}
-
-public extension UNNotificationAction {
-    convenience init(_ action: UserNotification.Action) {
-        var options = UNNotificationActionOptions()
-        if action.authenticationRequired {
-            options.insert(.authenticationRequired)
+extension UserNotification.Action: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification.Action {
+          id: \(id)
+          title: \(title)
+          authenticationRequired: \(authenticationRequired ? "YES" : "NO")
+          destructive: \(destructive ? "YES" : "NO")
+          foreground: \(foreground ? "YES" : "NO")
         }
-        if action.destructive {
-            options.insert(.destructive)
-        }
-        if action.foreground {
-            options.insert(.foreground)
-        }
-        
-        self.init(
-            identifier: action.id,
-            title: action.title,
-            options: options
-        )
+        """
     }
 }
-#endif

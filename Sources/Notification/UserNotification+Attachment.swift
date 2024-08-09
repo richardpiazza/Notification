@@ -23,20 +23,14 @@ public extension UserNotification {
     }
 }
 
-#if canImport(UserNotifications)
-import UserNotifications
-
-public extension UserNotification.Attachment {
-    init(_ attachment: UNNotificationAttachment) {
-        id = attachment.identifier
-        url = attachment.url
-        type = attachment.type
+extension UserNotification.Attachment: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        UserNotification.Attachment {
+          id: \(id)
+          url: \(url.absoluteString)
+          type: \(type)
+        }
+        """
     }
 }
-
-public extension UNNotificationAttachment {
-    convenience init(_ attachment: UserNotification.Attachment) throws {
-        try self.init(identifier: attachment.id, url: attachment.url, options: nil)
-    }
-}
-#endif
