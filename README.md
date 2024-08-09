@@ -1,9 +1,7 @@
 # Notification
 A swift library for interacting with user notifications.
 
-<p>
-    <img src="https://github.com/richardpiazza/Notification/workflows/Swift/badge.svg?branch=main" />
-</p>
+[![Swift](https://github.com/richardpiazza/Notification/actions/workflows/swift.yml/badge.svg)](https://github.com/richardpiazza/Notification/actions/workflows/swift.yml)
 
 ## Installation
 

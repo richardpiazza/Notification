@@ -32,7 +32,10 @@ final class NotificationManagerTests: XCTestCase {
         }
     }
     
-    private let service = EmulatedNotificationManager()
+    private let notificationManager = EmulatedNotificationManager()
+    private let aps1 = APS(alert: Alert(body: "Message 1"))
+    private let aps2 = APS(alert: Alert(body: "Message 2"))
+    private let aps3 = APS(alert: Alert(body: "Message 3"))
     
     #if canImport(Combine)
     private var cancelStore: [AnyCancellable] = []
@@ -41,33 +44,30 @@ final class NotificationManagerTests: XCTestCase {
         var contentReceived: Int = 0
         var notificationsReceived: Int = 0
         
-        service.trafficPublisher
+        notificationManager.trafficPublisher
             .sink { _ in
                 contentReceived += 1
             }
             .store(in: &cancelStore)
         
-        service.remoteNotificationPublisher()
+        notificationManager.remoteNotificationPublisher()
             .sink { (_: APushNotification) in
                 notificationsReceived += 1
             }
             .store(in: &cancelStore)
         
-        let aps1 = APS(alert: Alert(body: "Message 1"))
         if let content = aps1.payload {
             let request = UserNotification.Request(content: UserNotification.Content(payload: content))
-            try service.localNotificationRequest(request)
+            try notificationManager.localNotificationRequest(request)
         }
         
-        let aps2 = APS(alert: Alert(body: "Message 2"))
         let aPush = APushNotification(aps: aps2, category: "Testing")
         let request2 = UserNotification.Request(content: UserNotification.Content(payload: aPush.payload))
-        try service.localNotificationRequest(request2)
+        try notificationManager.localNotificationRequest(request2)
         
-        let aps3 = APS(alert: Alert(body: "Message 3"))
         if let content = aps3.payload {
             let request = UserNotification.Request(content: UserNotification.Content(payload: content))
-            try service.localNotificationRequest(request)
+            try notificationManager.localNotificationRequest(request)
         }
         
         _ = DispatchSemaphore(value: 0) .wait(timeout: .now() + 2.0)
@@ -76,4 +76,37 @@ final class NotificationManagerTests: XCTestCase {
         XCTAssertEqual(notificationsReceived, 1)
     }
     #endif
+    
+    func testTrafficStream() async throws {
+        let subscription1 = Task {
+            var output: [Traffic] = []
+            for try await element in await notificationManager.trafficStream() {
+                output.append(element)
+            }
+            return output
+        }
+        
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
+        if let payload = aps1.payload {
+            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+            try notificationManager.localNotificationRequest(request)
+        }
+        
+        if let payload = aps2.payload {
+            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+            try notificationManager.localNotificationRequest(request)
+        }
+        
+        if let payload = aps3.payload {
+            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+            try notificationManager.localNotificationRequest(request)
+        }
+        
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
+        subscription1.cancel()
+        let traffic = try await subscription1.value
+        XCTAssertEqual(traffic.count, 3)
+    }
 }
