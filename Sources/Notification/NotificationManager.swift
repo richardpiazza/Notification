@@ -41,6 +41,10 @@ public protocol NotificationManager {
     func removePendingAndDeliveredNotifications(withId id: String)
     func removePendingAndDeliveredNotifications(withPrefix prefix: String)
     
+    func authorizationStream() async -> AsyncStream<AuthorizationStatus>
+    func apnsTokenStream() async -> AsyncStream<Data?>
+    func trafficStream() async -> AsyncStream<Traffic>
+    
     #if canImport(Combine)
     /// Publisher that emits changes to the `AuthorizationStatus`.
     var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { get }
