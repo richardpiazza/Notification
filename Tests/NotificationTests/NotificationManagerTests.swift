@@ -1,5 +1,7 @@
 import XCTest
+#if canImport(Combine)
 import Combine
+#endif
 @testable import Notification
 
 final class NotificationManagerTests: XCTestCase {
@@ -31,6 +33,8 @@ final class NotificationManagerTests: XCTestCase {
     }
     
     private let service = EmulatedNotificationManager()
+    
+    #if canImport(Combine)
     private var cancelStore: [AnyCancellable] = []
     
     func testPushNotificationPublisher() throws {
@@ -71,4 +75,5 @@ final class NotificationManagerTests: XCTestCase {
         XCTAssertEqual(contentReceived, 3)
         XCTAssertEqual(notificationsReceived, 1)
     }
+    #endif
 }
