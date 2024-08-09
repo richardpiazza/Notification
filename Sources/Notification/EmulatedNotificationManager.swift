@@ -63,7 +63,11 @@ open class EmulatedNotificationManager: NotificationManager {
     }
     
     public init(configuration: Configuration) {
+        #if canImport(Combine)
         authorizationSubject = .init(configuration.authorization ?? .notDetermined)
+        #else
+        authorization = configuration.authorization ?? .notDetermined
+        #endif
         self.authorizationBehavior = configuration.authorizationBehavior ?? .failure
     }
     
