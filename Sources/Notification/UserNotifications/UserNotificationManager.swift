@@ -8,20 +8,26 @@ import UserNotifications
 
 open class UserNotificationManager: NSObject, NotificationManager {
     
-    static let logger = Logger(label: "package.notification")
+    private let logger: Logger = .notification
     
     internal let userNotificationCenter: UNUserNotificationCenter = .current()
     
-    public private(set) var categories: [UserNotification.Category] = []
-    public var authorization: AuthorizationStatus { authorizationSubject.value }
-    public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
-    public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
-    public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
-    
-    private var notificationSettings: UNNotificationSettings?
+    #if canImport(Combine)
     private var authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never> = .init(.notDetermined)
+    public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
+    public var authorization: AuthorizationStatus { authorizationSubject.value }
+    
     private var apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
+    public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
+    
     private var trafficSubject: PassthroughSubject<Traffic, Never> = .init()
+    public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
+    #else
+    public private(set) var authorization: AuthorizationStatus
+    #endif
+    
+    public private(set) var categories: [UserNotification.Category] = []
+    private var notificationSettings: UNNotificationSettings?
     private var redactions: [String]
     
     /// Initialize a `UserNotificationManager`.
@@ -29,7 +35,10 @@ open class UserNotificationManager: NSObject, NotificationManager {
     /// - parameters:
     ///   - categories: Categories that are registered with the `UNUserNotificationCenter`.
     ///   - redactions: KeyPaths that should be redacted from automatic logging.
-    public init(categories: [UserNotification.Category] = [], redactions: [String] = []) {
+    public init(
+        categories: [UserNotification.Category] = [],
+        redactions: [String] = []
+    ) {
         self.categories = categories
         self.redactions = redactions
         super.init()
@@ -44,15 +53,15 @@ open class UserNotificationManager: NSObject, NotificationManager {
         let options = UNAuthorizationOptions([.badge, .sound, .alert])
         userNotificationCenter.requestAuthorization(options: options) { [weak self] granted, error in
             if let e = error {
-                Self.logger.error("Request Authorization Failure", metadata: ["localizedDescription": .string(e.localizedDescription)])
+                Logger.notification.error("Request Authorization Failure", metadata: ["localizedDescription": .string(e.localizedDescription)])
             } else if granted {
                 // One or more options were granted.
                 self?.authorizationSubject.send(.authorized)
-                Self.logger.info("Notification Authorization Granted")
+                Logger.notification.info("Notification Authorization Granted")
             } else {
                 // No options were granted.
                 self?.authorizationSubject.send(.denied)
-                Self.logger.warning("Notification Authorization Denied")
+                Logger.notification.warning("Notification Authorization Denied")
             }
         }
     }
@@ -60,18 +69,22 @@ open class UserNotificationManager: NSObject, NotificationManager {
     public func didRegisterForRemoteNotificationsWithDeviceToken(_ token: Data) {
         let hex = token.map { String(format: "%.2hhx", $0) }.joined()
         let content: [AnyHashable: Any] = ["apnsToken": hex]
-        Self.logger.debug("Registered for Remote Notifications: \(content.json(redacting: redactions))")
+        logger.debug("Registered for Remote Notifications: \(content.json(redacting: redactions))")
         
+        #if canImport(Combine)
         apnsTokenSubject.send(token)
+        #endif
     }
     
     public func didFailToRegisterForRemoteNotificationsWithError(_ error: Error) {
-        Self.logger.error("Remote Register Failed", metadata: ["localizedDescription": .string(error.localizedDescription)])
+        logger.error("Remote Register Failed", metadata: ["localizedDescription": .string(error.localizedDescription)])
     }
     
     public func didReceiveRemoteNotification(_ content: Payload) async throws -> Bool {
-        Self.logger.debug("User Notification - Silent: \(content.json(redacting: redactions))")
+        logger.debug("User Notification - Silent: \(content.json(redacting: redactions))")
+        #if canImport(Combine)
         trafficSubject.send(.silent(content))
+        #endif
         return true
     }
     
@@ -110,8 +123,10 @@ open class UserNotificationManager: NSObject, NotificationManager {
 extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let content = notification.request.content.userInfo
-        Self.logger.debug("User Notification - Presenting: \(content.json(redacting: redactions))")
+        logger.debug("User Notification - Presenting: \(content.json(redacting: redactions))")
+        #if canImport(Combine)
         trafficSubject.send(.presented(content))
+        #endif
         
         DispatchQueue.main.async {
             completionHandler(UNNotificationPresentationOptions([.list, .banner, .sound, .badge]))
@@ -131,8 +146,10 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
             action = categories.flatMap { $0.actions }.first(where: { $0.id == response.actionIdentifier }) ?? .default
         }
         
-        Self.logger.debug("User Notification - Interacted: \(content.json(redacting: redactions)) \(action)")
+        logger.debug("User Notification - Interacted: \(content.json(redacting: redactions)) \(action)")
+        #if canImport(Combine)
         trafficSubject.send(.interacted(content, action))
+        #endif
         
         DispatchQueue.main.async {
             completionHandler()
@@ -155,7 +172,11 @@ private extension UserNotificationManager {
             }
             
             self.notificationSettings = notificationSettings
+            #if canImport(Combine)
             self.authorizationSubject.send(AuthorizationStatus.make(with: notificationSettings.authorizationStatus))
+            #else
+            authorization = notificationSettings.authorizationStatus
+            #endif
         }
     }
 }

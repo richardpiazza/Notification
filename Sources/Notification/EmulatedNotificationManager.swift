@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(Combine)
 import Combine
+#endif
 import Harness
 
 open class EmulatedNotificationManager: NotificationManager {
@@ -21,28 +23,42 @@ open class EmulatedNotificationManager: NotificationManager {
         public var authorization: AuthorizationStatus?
         public var authorizationBehavior: AuthorizationBehavior?
         
-        public init(authorization: AuthorizationStatus? = nil, authorizationBehavior: AuthorizationBehavior? = nil) {
+        public init(
+            authorization: AuthorizationStatus? = nil,
+            authorizationBehavior: AuthorizationBehavior? = nil
+        ) {
             self.authorization = authorization
             self.authorizationBehavior = authorizationBehavior
         }
     }
     
+    #if canImport(Combine)
     public let authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never>
-    public var authorization: AuthorizationStatus { authorizationSubject.value }
     public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
+    public var authorization: AuthorizationStatus { authorizationSubject.value }
     
     public let apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
     public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
     
     public let trafficSubject: PassthroughSubject<Traffic, Never> = .init()
     public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
+    #else
+    public private(set) var authorization: AuthorizationStatus
+    #endif
     
     open var categories: [UserNotification.Category] = []
     
     internal var authorizationBehavior: AuthorizationBehavior
     
-    public init(authorization: AuthorizationStatus = .notDetermined, authorizationBehavior: AuthorizationBehavior = .failure) {
+    public init(
+        authorization: AuthorizationStatus = .notDetermined,
+        authorizationBehavior: AuthorizationBehavior = .failure
+    ) {
+        #if canImport(Combine)
         authorizationSubject = .init(authorization)
+        #else
+        self.authorization = authorization
+        #endif
         self.authorizationBehavior = authorizationBehavior
     }
     
@@ -58,39 +74,56 @@ open class EmulatedNotificationManager: NotificationManager {
                 return
             }
             
-            authorizationSubject.send(.authorized)
+            setAuthorizationStatus(.authorized)
         case .failure:
             guard authorization != .denied else {
                 return
             }
             
-            authorizationSubject.send(.denied)
+            setAuthorizationStatus(.denied)
         }
     }
     
     public func didRegisterForRemoteNotificationsWithDeviceToken(_ token: Data) {
+        #if canImport(Combine)
         apnsTokenSubject.send(token)
+        #endif
     }
     
     public func didFailToRegisterForRemoteNotificationsWithError(_ error: Error) {
     }
     
     public func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool {
+        #if canImport(Combine)
         trafficSubject.send(.silent(payload))
+        #endif
         return true
     }
     
     public func localNotificationRequest(_ request: UserNotification.Request) throws {
+        let traffic: Traffic
         if request.content.payload.aps?.isSilent == true {
-            trafficSubject.send(.silent(request.content.payload))
+            traffic = .silent(request.content.payload)
         } else {
-            trafficSubject.send(.interacted(request.content.payload, .default))
+            traffic = .interacted(request.content.payload, .default)
         }
+        
+        #if canImport(Combine)
+        trafficSubject.send(traffic)
+        #endif
     }
     
     public func removePendingAndDeliveredNotifications(withId id: String) {
     }
     
     public func removePendingAndDeliveredNotifications(withPrefix prefix: String) {
+    }
+    
+    private func setAuthorizationStatus(_ authorization: AuthorizationStatus) {
+        #if canImport(Combine)
+        authorizationSubject.send(authorization)
+        #else
+        self.authorization = authorization
+        #endif
     }
 }
