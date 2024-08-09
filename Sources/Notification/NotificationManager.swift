@@ -8,9 +8,6 @@ public protocol NotificationManager {
     /// Indicates the current authorization of the resources.
     var authorization: AuthorizationStatus { get }
     
-    /// Publisher that emits changes to the `AuthorizationStatus`.
-    var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { get }
-    
     /// Custom categories and actions.
     var categories: [UserNotification.Category] { get }
     
@@ -45,6 +42,9 @@ public protocol NotificationManager {
     func removePendingAndDeliveredNotifications(withPrefix prefix: String)
     
     #if canImport(Combine)
+    /// Publisher that emits changes to the `AuthorizationStatus`.
+    var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { get }
+    
     /// Publisher that emits changes to the APNS token.
     var apnsTokenPublisher: AnyPublisher<Data?, Never> { get }
     

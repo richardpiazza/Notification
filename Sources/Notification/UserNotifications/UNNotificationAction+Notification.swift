@@ -67,4 +67,9 @@ public extension UNNotificationAction {
         )
     }
 }
+#else
+public extension UserNotification.Action {
+    static let `default` = UserNotification.Action(id: "com.apple.UNNotificationDefaultActionIdentifier")
+    static let dismiss = UserNotification.Action(id: "com.apple.UNNotificationDismissActionIdentifier")
+}
 #endif
