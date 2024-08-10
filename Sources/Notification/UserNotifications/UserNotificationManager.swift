@@ -81,8 +81,8 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
         let metadata: Logger.Metadata = [
             "payload": .string(payload.json(redacting: redactions))
         ]
-        logger.debug("Presenting Notification", metadata: metadata)
-        yieldTraffic(.presented(payload))
+        logger.debug("Notification Received (Foreground)", metadata: metadata)
+        yieldTraffic(.received(payload: payload, inBackground: false))
         
         DispatchQueue.main.async {
             completionHandler(UNNotificationPresentationOptions([.list, .banner, .sound, .badge]))
@@ -105,8 +105,8 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
         let metadata: Logger.Metadata = [
             "payload": .string(payload.json(redacting: redactions))
         ]
-        logger.debug("Interacted With Notification", metadata: metadata)
-        yieldTraffic(.interacted(payload, action))
+        logger.debug("Notification Interaction", metadata: metadata)
+        yieldTraffic(.interaction(payload: payload, action: action))
         
         DispatchQueue.main.async {
             completionHandler()

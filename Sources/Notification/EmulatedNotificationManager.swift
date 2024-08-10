@@ -62,14 +62,7 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
     }
     
     public override func localNotificationRequest(_ request: UserNotification.Request) throws {
-        let traffic: Traffic
-        if request.content.payload.aps?.isSilent == true {
-            traffic = .silent(request.content.payload)
-        } else {
-            traffic = .interacted(request.content.payload, .default)
-        }
-        
-        yieldTraffic(traffic)
+        yieldTraffic(.received(payload: request.content.payload, inBackground: false))
     }
     
     public override func removePendingAndDeliveredNotifications(withId id: String) {

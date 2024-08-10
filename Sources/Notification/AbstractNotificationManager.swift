@@ -60,7 +60,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         let metadata: Logger.Metadata = [
             "apnsToken": .string(content.json(redacting: redactions))
         ]
-        logger.debug("Registered for Remote Notifications", metadata: metadata)
+        logger.debug("Remote Notification Registration Complete", metadata: metadata)
         yieldAPNSTokenData(token)
     }
     
@@ -68,15 +68,15 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         let metadata: Logger.Metadata = [
             "localizedDescription": .string(error.localizedDescription)
         ]
-        logger.error("Remote Register Failed", metadata: metadata)
+        logger.error("Remote Notification Registration Failed", metadata: metadata)
     }
     
-    public func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool {
+    public func didReceiveRemoteNotification(_ payload: Payload, inBackground: Bool) async throws -> Bool {
         let metadata: Logger.Metadata = [
             "payload": .string(payload.json(redacting: redactions))
         ]
-        logger.debug("Received Remote Notification", metadata: metadata)
-        yieldTraffic(.silent(payload))
+        logger.debug("Notification Received (\(inBackground ? "Background" : "Foreground")", metadata: metadata)
+        yieldTraffic(.received(payload: payload, inBackground: inBackground))
         return true
     }
     
