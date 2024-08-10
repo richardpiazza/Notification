@@ -33,7 +33,7 @@ public protocol NotificationManager {
     /// will be interpreted as a `UIBackgroundFetchResult`.
     ///
     /// This can also be called at any point to propagate a notification payload through the service.
-    func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool
+    func didReceiveRemoteNotification(_ payload: Payload, inBackground: Bool) async throws -> Bool
     
     /// Schedule a local notification to be presented.
     func localNotificationRequest(_ request: UserNotification.Request) throws
@@ -71,17 +71,17 @@ public protocol NotificationManager {
 public extension NotificationManager {
     var authorized: Bool { authorization == .authorized }
     
+    @available(*, deprecated, renamed: "didReceiveRemoteNotification(_:inBackground:)")
+    func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool {
+        try await didReceiveRemoteNotification(payload, inBackground: true)
+    }
+    
     #if canImport(Combine)
     func remoteNotificationPublisher<T>(decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Never> where T: RemoteNotification & Decodable {
         trafficPublisher
-            // `Payload` from '.silent' and '.interacted' only.
-            .compactMap { traffic in
-                switch traffic {
-                case .silent(let payload), .interacted(let payload, _):
-                    return payload
-                default:
-                    return nil
-                }
+            // `Payload` from traffic.
+            .map { traffic in
+                traffic.payload
             }
             // Decode `Payload` to `T`
             .flatMap { payload in
