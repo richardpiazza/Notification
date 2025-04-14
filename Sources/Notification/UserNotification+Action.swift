@@ -12,7 +12,7 @@ public extension UserNotification {
         public let destructive: Bool
         // Whether this action should cause the application to launch in the foreground.
         public let foreground: Bool
-        
+
         public init(
             id: String = UUID().uuidString,
             title: String = "",

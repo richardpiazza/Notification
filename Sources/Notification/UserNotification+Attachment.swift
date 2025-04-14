@@ -10,7 +10,7 @@ public extension UserNotification {
         public let url: URL
         /// The UTI of the attachment.
         public let type: String
-        
+
         public init(
             id: String = "",
             url: URL = URL(fileURLWithPath: ""),

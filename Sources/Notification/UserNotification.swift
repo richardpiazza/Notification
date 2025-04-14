@@ -3,7 +3,7 @@ import Foundation
 public struct UserNotification {
     public let date: Date
     public let request: Request
-    
+
     public init(
         date: Date = Date(),
         request: Request = Request()

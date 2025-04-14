@@ -1,7 +1,8 @@
 # Notification
 A swift library for interacting with user notifications.
 
-[![Swift](https://github.com/richardpiazza/Notification/actions/workflows/swift.yml/badge.svg)](https://github.com/richardpiazza/Notification/actions/workflows/swift.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FNotification%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/richardpiazza/Notification)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Frichardpiazza%2FNotification%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/richardpiazza/Notification)
 
 ## Installation
 

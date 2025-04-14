@@ -9,14 +9,14 @@ public extension UserNotification.Request {
             trigger: request.trigger.map { UserNotification.Trigger.make(with: $0) }
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Request.make(with:)")
     init(_ request: UNNotificationRequest) {
         id = request.identifier
         content = request.content.content
         trigger = request.trigger?.trigger
     }
-    
+
     @available(*, deprecated, renamed: "UNNotificationRequest.make(with:)")
     var unNotificationRequest: UNNotificationRequest {
         let notificationContent = UNMutableNotificationContent()
@@ -32,7 +32,7 @@ public extension UserNotification.Request {
         notificationContent.threadIdentifier = content.threadIdentifier
         notificationContent.title = content.title
         notificationContent.userInfo = content.payload
-        
+
         let notificationTrigger: UNNotificationTrigger?
         switch trigger?.event {
         case .calendar(let components):
@@ -46,7 +46,7 @@ public extension UserNotification.Request {
         default:
             notificationTrigger = nil
         }
-        
+
         return UNNotificationRequest(identifier: id, content: notificationContent, trigger: notificationTrigger)
     }
 }
@@ -57,14 +57,14 @@ public extension UNNotificationRequest {
         if let requestTrigger = request.trigger {
             trigger = try? UNNotificationTrigger.make(with: requestTrigger)
         }
-        
+
         return UNNotificationRequest(
             identifier: request.id,
             content: UNNotificationContent.make(with: request.content),
             trigger: trigger
         )
     }
-    
+
     @available(*, deprecated, renamed: "UNNotificationRequest.make(with:)")
     convenience init(_ request: UserNotification.Request) {
         self.init(

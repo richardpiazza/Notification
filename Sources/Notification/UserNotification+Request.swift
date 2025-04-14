@@ -5,7 +5,7 @@ public extension UserNotification {
         public let id: String
         public let content: Content
         public let trigger: Trigger?
-        
+
         public init(
             id: String = UUID().uuidString,
             content: Content = .init(),

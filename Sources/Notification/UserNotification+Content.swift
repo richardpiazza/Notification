@@ -24,7 +24,7 @@ public extension UserNotification {
         ///
         /// The contents of the push payload will be set as the userInfo for remote notifications.
         public let payload: Payload
-        
+
         public init(
             attachments: [UserNotification.Attachment] = [],
             badge: Int? = nil,

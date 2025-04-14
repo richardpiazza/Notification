@@ -19,7 +19,7 @@ public extension UNNotificationCategory {
             options: .init()
         )
     }
-    
+
     @available(*, deprecated, renamed: "UNNotificationCategory.make(with:)")
     convenience init(_ category: UserNotification.Category) {
         self.init(
@@ -29,12 +29,12 @@ public extension UNNotificationCategory {
             options: .init()
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Category.make(with:)")
     var notificationUserNotificationCategory: UserNotification.Category {
         UserNotification.Category(
             id: identifier,
-            actions: actions.map { $0.notificationUserNotificationAction }
+            actions: actions.map(\.notificationUserNotificationAction)
         )
     }
 }

@@ -12,33 +12,33 @@ public extension UserNotification {
         ///   - name: The name of a sound file to be played for a critical alert. (Contained in the app bundle)
         ///   - volume: The audio volume is expected to be between 0.0f and 1.0f.
         case critical(name: String? = nil, volume: Float? = nil)
-        
+
         public var isDefault: Bool {
             switch self {
             case .default:
-                return true
+                true
             default:
-                return false
+                false
             }
         }
-        
+
         public var isCritical: Bool {
             switch self {
             case .critical:
-                return true
+                true
             default:
-                return false
+                false
             }
         }
-        
+
         public var name: String? {
             switch self {
             case .named(let name):
-                return name
+                name
             case .critical(let name, _):
-                return name
+                name
             default:
-                return nil
+                nil
             }
         }
     }
