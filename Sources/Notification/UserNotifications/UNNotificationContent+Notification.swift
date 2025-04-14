@@ -8,7 +8,7 @@ public extension UserNotification.Content {
         #else
         let launchImageName = ""
         #endif
-        
+
         return UserNotification.Content(
             attachments: notificationContent.attachments.map { UserNotification.Attachment.make(with: $0) },
             badge: notificationContent.badge?.intValue,
@@ -22,10 +22,10 @@ public extension UserNotification.Content {
             payload: notificationContent.userInfo
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Content.make(with:)")
     init(_ content: UNNotificationContent) {
-        attachments = content.attachments.map { $0.notificationUserNotificationAttachment }
+        attachments = content.attachments.map(\.notificationUserNotificationAttachment)
         badge = content.badge?.intValue
         body = content.body
         categoryId = content.categoryIdentifier
@@ -61,7 +61,7 @@ public extension UNNotificationContent {
         content.userInfo = notificationContent.payload
         return content
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Content.make(with:)")
     var content: UserNotification.Content {
         #if os(macOS)
@@ -69,9 +69,9 @@ public extension UNNotificationContent {
         #else
         let imageName = launchImageName
         #endif
-        
+
         return UserNotification.Content(
-            attachments: attachments.map { $0.notificationUserNotificationAttachment },
+            attachments: attachments.map(\.notificationUserNotificationAttachment),
             badge: badge?.intValue,
             body: body,
             categoryId: categoryIdentifier,

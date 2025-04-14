@@ -9,7 +9,7 @@ public extension UserNotification.Attachment {
             type: attachment.type
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Attachment.make(with:)")
     init(_ attachment: UNNotificationAttachment) {
         id = attachment.identifier
@@ -26,7 +26,7 @@ public extension UNNotificationAttachment {
             options: nil
         )
     }
-    
+
     @available(*, deprecated, renamed: "UNNotificationAttachment.make(with:)")
     convenience init(_ attachment: UserNotification.Attachment) throws {
         try self.init(
@@ -35,7 +35,7 @@ public extension UNNotificationAttachment {
             options: nil
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Attachment.make(with:)")
     var notificationUserNotificationAttachment: UserNotification.Attachment {
         UserNotification.Attachment(

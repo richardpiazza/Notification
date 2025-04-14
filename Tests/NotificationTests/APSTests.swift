@@ -1,10 +1,10 @@
-import XCTest
 @testable import Notification
+import XCTest
 
 final class APSTests: XCTestCase {
-    
+
     let decoder = JSONDecoder()
-    
+
     func testAPSDecode() throws {
         let json = """
         {
@@ -21,7 +21,7 @@ final class APSTests: XCTestCase {
         XCTAssertEqual(aps.alert?.body, "This is an example notification.")
         XCTAssertEqual(aps.contentAvailable, 1)
     }
-    
+
     /// Even though the APNS spec declares 'content-available' as an `Int`, many services
     /// return this an a `String`. Strict JSON parsing would normally fail.
     func testAPSDecodeWithStringContentAvailable() throws {

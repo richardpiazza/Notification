@@ -4,7 +4,7 @@ import UserNotifications
 public extension UserNotification.Action {
     static let `default` = UserNotification.Action(id: UNNotificationDefaultActionIdentifier)
     static let dismiss = UserNotification.Action(id: UNNotificationDismissActionIdentifier)
-    
+
     static func make(with action: UNNotificationAction) -> UserNotification.Action {
         UserNotification.Action(
             id: action.identifier,
@@ -28,14 +28,14 @@ public extension UNNotificationAction {
         if action.foreground {
             options.insert(.foreground)
         }
-        
+
         return UNNotificationAction(
             identifier: action.id,
             title: action.title,
             options: options
         )
     }
-    
+
     @available(*, deprecated, renamed: "UNNotificationAction.make(with:)")
     convenience init(_ action: UserNotification.Action) {
         var options = UNNotificationActionOptions()
@@ -48,14 +48,14 @@ public extension UNNotificationAction {
         if action.foreground {
             options.insert(.foreground)
         }
-        
+
         self.init(
             identifier: action.id,
             title: action.title,
             options: options
         )
     }
-    
+
     @available(*, deprecated, renamed: "UserNotification.Action.make(with:)")
     var notificationUserNotificationAction: UserNotification.Action {
         UserNotification.Action(

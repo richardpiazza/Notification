@@ -17,7 +17,7 @@ public extension AuthorizationStatus {
             self = .notDetermined
         }
     }
-    
+
     static func make(with authorizationStatus: UNAuthorizationStatus) -> AuthorizationStatus {
         switch authorizationStatus {
         case .notDetermined:

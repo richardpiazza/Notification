@@ -10,7 +10,7 @@ public protocol NotificationTriggerConvertible {
 @available(*, deprecated)
 public struct AnyNotificationTriggerConvertible: NotificationTriggerConvertible {
     public let unNotificationTrigger: UNNotificationTrigger
-    
+
     public init(_ trigger: UNNotificationTrigger) {
         unNotificationTrigger = trigger
     }
@@ -19,7 +19,7 @@ public struct AnyNotificationTriggerConvertible: NotificationTriggerConvertible 
 
 public extension UserNotification {
     struct Trigger {
-        
+
         public enum Event {
             case push
             case timeInterval(TimeInterval)
@@ -29,10 +29,10 @@ public extension UserNotification {
             case convertible(NotificationTriggerConvertible)
             #endif
         }
-        
+
         public let event: Event?
         public let repeats: Bool
-        
+
         public init(
             event: Event? = nil,
             repeats: Bool = false
@@ -64,7 +64,7 @@ extension UserNotification.Trigger.Event: CustomDebugStringConvertible {
         case .calendar(let dateComponents):
             return "UserNotification.Trigger.Event { Date Components - \(dateComponents) }"
         #if canImport(UserNotifications)
-        case .convertible(_):
+        case .convertible:
             return "UserNotification.Trigger.Event { <DEPRECATED> }"
         #endif
         }
