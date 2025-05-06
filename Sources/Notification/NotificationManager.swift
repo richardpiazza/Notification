@@ -71,6 +71,13 @@ public protocol NotificationManager {
 public extension NotificationManager {
     var authorized: Bool { authorization == .authorized }
 
+    /// Requests authorization only when status is `.notDetermined`.
+    func requestAuthorizationIfNeeded() {
+        if case .notDetermined = authorization {
+            requestAuthorization()
+        }
+    }
+
     #if canImport(Combine)
     func remoteNotificationPublisher<T>(decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Never> where T: RemoteNotification & Decodable {
         trafficPublisher
