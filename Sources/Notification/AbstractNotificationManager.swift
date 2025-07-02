@@ -2,7 +2,6 @@ import Foundation
 #if canImport(Combine)
 import Combine
 #endif
-import AsyncPlus
 import Logging
 
 /// Notification manager that is pre-configured with support for Combine Publishers and Async Streams.
@@ -22,9 +21,9 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     public private(set) var authorization: AuthorizationStatus
     #endif
 
-    public let authorizationPassthroughSubject = PassthroughAsyncSubject<AuthorizationStatus>()
-    public let apnsTokenPassthroughSubject = PassthroughAsyncSubject<Data?>()
-    public let trafficPassthroughSubject = PassthroughAsyncSubject<Traffic>()
+    public private(set) var authorizationSubjects: [UUID: AsyncStream<AuthorizationStatus>.Continuation] = [:]
+    public private(set) var apnsTokenSubjects: [UUID: AsyncStream<Data?>.Continuation] = [:]
+    public private(set) var trafficSubjects: [UUID: AsyncStream<Traffic>.Continuation] = [:]
 
     public private(set) var categories: [UserNotification.Category]
     public private(set) var redactions: [String]
@@ -92,16 +91,34 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         preconditionFailure("Superclass must provide implementation.")
     }
 
-    public func authorizationStream() async -> AsyncStream<AuthorizationStatus> {
-        await authorizationPassthroughSubject.sink()
+    public func authorizationStream() -> AsyncStream<AuthorizationStatus> {
+        let id = UUID()
+        let stream = AsyncStream.makeStream(of: AuthorizationStatus.self)
+        stream.continuation.onTermination = { [weak self] termination in
+            self?.authorizationSubjects[id] = nil
+        }
+        authorizationSubjects[id] = stream.continuation
+        return stream.stream
     }
 
-    public func apnsTokenStream() async -> AsyncStream<Data?> {
-        await apnsTokenPassthroughSubject.sink()
+    public func apnsTokenStream() -> AsyncStream<Data?> {
+        let id = UUID()
+        let stream = AsyncStream.makeStream(of: Data?.self)
+        stream.continuation.onTermination = { [weak self] termination in
+            self?.apnsTokenSubjects[id] = nil
+        }
+        apnsTokenSubjects[id] = stream.continuation
+        return stream.stream
     }
 
-    public func trafficStream() async -> AsyncStream<Traffic> {
-        await trafficPassthroughSubject.sink()
+    public func trafficStream() -> AsyncStream<Traffic> {
+        let id = UUID()
+        let stream = AsyncStream.makeStream(of: Traffic.self)
+        stream.continuation.onTermination = { [weak self] termination in
+            self?.trafficSubjects[id] = nil
+        }
+        trafficSubjects[id] = stream.continuation
+        return stream.stream
     }
 }
 
@@ -112,8 +129,8 @@ public extension AbstractNotificationManager {
         #else
         authorization = authorizationStatus
         #endif
-        Task {
-            await authorizationPassthroughSubject.yield(authorizationStatus)
+        for (_, continuation) in authorizationSubjects {
+            continuation.yield(authorizationStatus)
         }
     }
 
@@ -121,8 +138,8 @@ public extension AbstractNotificationManager {
         #if canImport(Combine)
         apnsTokenSubject.send(token)
         #endif
-        Task {
-            await apnsTokenPassthroughSubject.yield(token)
+        for (_, continuation) in apnsTokenSubjects {
+            continuation.yield(token)
         }
     }
 
@@ -130,8 +147,8 @@ public extension AbstractNotificationManager {
         #if canImport(Combine)
         trafficSubject.send(traffic)
         #endif
-        Task {
-            await trafficPassthroughSubject.yield(traffic)
+        for (_, continuation) in trafficSubjects {
+            continuation.yield(traffic)
         }
     }
 }
