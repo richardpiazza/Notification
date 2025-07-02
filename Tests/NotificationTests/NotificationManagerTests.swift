@@ -80,7 +80,7 @@ final class NotificationManagerTests: XCTestCase {
     func testTrafficStream() async throws {
         let subscription1 = Task {
             var output: [Traffic] = []
-            for try await element in await notificationManager.trafficStream() {
+            for try await element in notificationManager.trafficStream() {
                 output.append(element)
             }
             return output

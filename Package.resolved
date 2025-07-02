@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "asyncplus",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/richardpiazza/AsyncPlus",
-      "state" : {
-        "revision" : "ab486f6744539f8814296cc85a7cc317f165dfc0",
-        "version" : "0.3.2"
-      }
-    },
-    {
       "identity" : "harness",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/richardpiazza/Harness.git",

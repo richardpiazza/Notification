@@ -1,4 +1,4 @@
-// swift-tools-version:5.8
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,11 +6,11 @@ import PackageDescription
 let package = Package(
     name: "Notification",
     platforms: [
-        .macOS(.v12),
-        .macCatalyst(.v15),
-        .iOS(.v15),
-        .tvOS(.v15),
-        .watchOS(.v8),
+        .macOS(.v13),
+        .macCatalyst(.v16),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -25,7 +25,6 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-log.git", .upToNextMajor(from: "1.5.4")),
-        .package(url: "https://github.com/richardpiazza/AsyncPlus.git", .upToNextMajor(from: "0.3.2")),
         .package(url: "https://github.com/richardpiazza/Harness.git", .upToNextMajor(from: "1.2.0")),
     ],
     targets: [
@@ -35,7 +34,6 @@ let package = Package(
             name: "Notification",
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
-                .product(name: "AsyncPlus", package: "AsyncPlus"),
                 .product(name: "Harness", package: "Harness"),
             ]
         ),
