@@ -1,15 +1,22 @@
 import Foundation
 
-public struct FCMOptions: Codable {
+public struct FCMOptions: Hashable, Sendable, Codable {
     public let image: URL?
 
     public init(image: URL?) {
         self.image = image
     }
 
-    var notificationContent: Payload {
+    @available(*, deprecated, renamed: "payload")
+    var notificationContent: Payload { payload }
+
+    var payload: Payload {
         if let image {
-            [CodingKeys.image.stringValue: image]
+            [
+                "fcm_options": [
+                    "image": image,
+                ],
+            ]
         } else {
             [:]
         }

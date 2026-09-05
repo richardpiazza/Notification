@@ -15,26 +15,7 @@ public extension UNNotificationCategory {
         UNNotificationCategory(
             identifier: category.id,
             actions: category.actions.map { UNNotificationAction.make(with: $0) },
-            intentIdentifiers: [],
-            options: .init()
-        )
-    }
-
-    @available(*, deprecated, renamed: "UNNotificationCategory.make(with:)")
-    convenience init(_ category: UserNotification.Category) {
-        self.init(
-            identifier: category.id,
-            actions: category.actions.map { UNNotificationAction($0) },
-            intentIdentifiers: [],
-            options: .init()
-        )
-    }
-
-    @available(*, deprecated, renamed: "UserNotification.Category.make(with:)")
-    var notificationUserNotificationCategory: UserNotification.Category {
-        UserNotification.Category(
-            id: identifier,
-            actions: actions.map(\.notificationUserNotificationAction)
+            intentIdentifiers: []
         )
     }
 }

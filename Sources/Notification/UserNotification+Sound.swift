@@ -1,5 +1,5 @@
 public extension UserNotification {
-    enum Sound {
+    enum Sound: Hashable, Sendable {
         /// Default alerts
         case `default`
         /// The sound file to be played for the notification. (Contained in the app bundle)

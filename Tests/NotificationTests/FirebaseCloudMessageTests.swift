@@ -3,6 +3,16 @@ import XCTest
 
 final class FirebaseCloudMessageTests: XCTestCase {
 
+    struct CloudMessage: FCMNotification, Decodable {
+        let aps: APS
+        let options: FCMOptions?
+
+        enum CodingKeys: String, CodingKey {
+            case aps
+            case options = "fcm_options"
+        }
+    }
+
     let decoder = JSONDecoder()
 
     func testDecode() throws {
@@ -26,7 +36,7 @@ final class FirebaseCloudMessageTests: XCTestCase {
         """
 
         let data = try XCTUnwrap(json.data(using: .utf8))
-        let notification = try decoder.decode(FirebaseCloudMessage.self, from: data)
+        let notification = try decoder.decode(CloudMessage.self, from: data)
         XCTAssertNotNil(notification.aps)
         XCTAssertNotNil(notification.options?.image)
     }

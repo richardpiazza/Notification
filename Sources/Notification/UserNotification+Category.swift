@@ -1,7 +1,7 @@
 import Foundation
 
 public extension UserNotification {
-    struct Category: Codable, Identifiable {
+    struct Category: Hashable, Sendable, Identifiable, Codable {
 
         public let id: String
         public let actions: [Action]

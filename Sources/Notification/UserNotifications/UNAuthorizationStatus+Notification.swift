@@ -2,22 +2,6 @@
 import UserNotifications
 
 public extension AuthorizationStatus {
-    @available(*, deprecated, renamed: "AuthorizationStatus.make(with:)")
-    init(authorizationStatus: UNAuthorizationStatus) {
-        switch authorizationStatus {
-        case .denied:
-            self = .denied
-        case .authorized:
-            self = .authorized
-        case .provisional:
-            self = .provisional
-        case .ephemeral:
-            self = .ephemeral
-        default:
-            self = .notDetermined
-        }
-    }
-
     static func make(with authorizationStatus: UNAuthorizationStatus) -> AuthorizationStatus {
         switch authorizationStatus {
         case .notDetermined:

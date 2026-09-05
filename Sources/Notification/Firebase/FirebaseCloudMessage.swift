@@ -1,6 +1,7 @@
 import Foundation
 
 /// A `RemoteNotification` delivered through Google/Firebase Cloud Messaging.
+@available(*, deprecated, message: "Use/See `FMCNotification`")
 open class FirebaseCloudMessage: RemoteNotification, Codable {
 
     enum CodingKeys: String, CodingKey {
@@ -12,7 +13,7 @@ open class FirebaseCloudMessage: RemoteNotification, Codable {
     public let options: FCMOptions?
 
     public init(
-        aps: APS = .init(),
+        aps: APS = APS(),
         options: FCMOptions? = nil
     ) {
         self.aps = aps
@@ -28,7 +29,7 @@ open class FirebaseCloudMessage: RemoteNotification, Codable {
             }
         }
         if let options {
-            content.merge([CodingKeys.options.stringValue: options.notificationContent]) { _, overwrite in
+            content.merge(options.payload) { _, overwrite in
                 overwrite
             }
         }

@@ -1,12 +1,13 @@
 {
+  "originHash" : "bbb11fa6ee2154410f334cc15812c339838f9391d1e0f8d40e3228f5b7483bf9",
   "pins" : [
     {
       "identity" : "harness",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/richardpiazza/Harness.git",
       "state" : {
-        "revision" : "0fffad21894b52349c84dfdccb7e31e07019655f",
-        "version" : "1.2.0"
+        "revision" : "30c3a1adb227e11d1472db066fc3b74c3b29e18a",
+        "version" : "1.2.1"
       }
     },
     {
@@ -14,10 +15,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
-        "version" : "1.6.1"
+        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
+        "version" : "1.15.0"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

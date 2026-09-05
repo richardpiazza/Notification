@@ -1,33 +1,12 @@
 import Foundation
-#if canImport(UserNotifications)
-import UserNotifications
-
-@available(*, deprecated)
-public protocol NotificationTriggerConvertible {
-    var unNotificationTrigger: UNNotificationTrigger { get }
-}
-
-@available(*, deprecated)
-public struct AnyNotificationTriggerConvertible: NotificationTriggerConvertible {
-    public let unNotificationTrigger: UNNotificationTrigger
-
-    public init(_ trigger: UNNotificationTrigger) {
-        unNotificationTrigger = trigger
-    }
-}
-#endif
 
 public extension UserNotification {
-    struct Trigger {
+    struct Trigger: Hashable, Sendable {
 
-        public enum Event {
+        public enum Event: Hashable, Sendable {
             case push
             case timeInterval(TimeInterval)
             case calendar(DateComponents)
-            #if canImport(UserNotifications)
-            @available(*, deprecated)
-            case convertible(NotificationTriggerConvertible)
-            #endif
         }
 
         public let event: Event?
@@ -58,15 +37,11 @@ extension UserNotification.Trigger.Event: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case .push:
-            return "UserNotification.Trigger.Event { Push }"
+            "UserNotification.Trigger.Event { Push }"
         case .timeInterval(let timeInterval):
-            return "UserNotification.Trigger.Event { Time Interval - \(timeInterval) }"
+            "UserNotification.Trigger.Event { Time Interval - \(timeInterval) }"
         case .calendar(let dateComponents):
-            return "UserNotification.Trigger.Event { Date Components - \(dateComponents) }"
-        #if canImport(UserNotifications)
-        case .convertible:
-            return "UserNotification.Trigger.Event { <DEPRECATED> }"
-        #endif
+            "UserNotification.Trigger.Event { Date Components - \(dateComponents) }"
         }
     }
 }

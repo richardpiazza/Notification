@@ -22,24 +22,6 @@ public extension UserNotification.Content {
             payload: notificationContent.userInfo
         )
     }
-
-    @available(*, deprecated, renamed: "UserNotification.Content.make(with:)")
-    init(_ content: UNNotificationContent) {
-        attachments = content.attachments.map(\.notificationUserNotificationAttachment)
-        badge = content.badge?.intValue
-        body = content.body
-        categoryId = content.categoryIdentifier
-        #if os(iOS)
-        launchImageName = content.launchImageName
-        #else
-        launchImageName = ""
-        #endif
-        sound = nil
-        subtitle = content.subtitle
-        threadIdentifier = content.threadIdentifier
-        title = content.title
-        payload = content.userInfo
-    }
 }
 
 public extension UNNotificationContent {
@@ -60,28 +42,6 @@ public extension UNNotificationContent {
         content.title = notificationContent.title
         content.userInfo = notificationContent.payload
         return content
-    }
-
-    @available(*, deprecated, renamed: "UserNotification.Content.make(with:)")
-    var content: UserNotification.Content {
-        #if os(macOS)
-        let imageName = ""
-        #else
-        let imageName = launchImageName
-        #endif
-
-        return UserNotification.Content(
-            attachments: attachments.map(\.notificationUserNotificationAttachment),
-            badge: badge?.intValue,
-            body: body,
-            categoryId: categoryIdentifier,
-            launchImageName: imageName,
-            sound: nil,
-            subtitle: subtitle,
-            threadIdentifier: threadIdentifier,
-            title: title,
-            payload: userInfo
-        )
     }
 }
 #endif

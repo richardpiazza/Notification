@@ -35,7 +35,7 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            payload: Payload = .init()
+            payload: Payload = Payload()
         ) {
             self.attachments = attachments
             self.badge = badge

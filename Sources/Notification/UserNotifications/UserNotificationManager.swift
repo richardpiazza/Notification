@@ -75,7 +75,7 @@ open class UserNotificationManager: AbstractNotificationManager {
 
 // MARK: - UNUserNotificationCenterDelegate
 
-// NOTE: The async 'didReceive' method has an internal threading issue. Completion must be on main thread.
+/// NOTE: The async 'didReceive' method has an internal threading issue. Completion must be on main thread.
 extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let payload = notification.request.content.userInfo

@@ -15,7 +15,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     public let apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
     public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
 
-    public let trafficSubject: PassthroughSubject<Traffic, Never> = .init()
+    public let trafficSubject: PassthroughSubject<Traffic, Never> = PassthroughSubject()
     public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
     #else
     public private(set) var authorization: AuthorizationStatus
