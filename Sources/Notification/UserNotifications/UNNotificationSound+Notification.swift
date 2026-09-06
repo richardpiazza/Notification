@@ -13,7 +13,7 @@ public extension UNNotificationSound {
         case .critical(.none, .none):
             .defaultCritical
         case .named(let name):
-            .init(named: UNNotificationSoundName(name))
+            UNNotificationSound(named: UNNotificationSoundName(name))
         default:
             .default
         }

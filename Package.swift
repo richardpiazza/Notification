@@ -25,6 +25,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.15.0"),
+        .package(url: "https://github.com/richardpiazza/AsyncPlus.git", from: "0.5.0"),
         .package(url: "https://github.com/richardpiazza/Harness.git", from: "1.2.1"),
     ],
     targets: [
@@ -34,6 +35,7 @@ let package = Package(
             name: "Notification",
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
+                .product(name: "AsyncPlus", package: "AsyncPlus"),
                 .product(name: "Harness", package: "Harness"),
             ]
         ),
@@ -41,6 +43,9 @@ let package = Package(
             name: "NotificationTests",
             dependencies: [
                 "Notification",
+            ],
+            resources: [
+                .process("Resources"),
             ]
         ),
     ]
