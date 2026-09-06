@@ -20,7 +20,10 @@ open class UserNotificationManager: AbstractNotificationManager {
         )
 
         userNotificationCenter.delegate = self
-        registerCategoriesAndActions()
+        #if !os(tvOS)
+        let notificationCategories = categories.map { UNNotificationCategory.make(with: $0) }
+        userNotificationCenter.setNotificationCategories(Set(notificationCategories))
+        #endif
         getNotificationSettings()
     }
 
@@ -55,7 +58,9 @@ open class UserNotificationManager: AbstractNotificationManager {
 
     override public func removePendingAndDeliveredNotifications(withId id: String) {
         userNotificationCenter.removePendingNotificationRequests(withIdentifiers: [id])
+        #if !os(tvOS)
         userNotificationCenter.removeDeliveredNotifications(withIdentifiers: [id])
+        #endif
     }
 
     override public func removePendingAndDeliveredNotifications(withPrefix prefix: String) {
@@ -65,11 +70,13 @@ open class UserNotificationManager: AbstractNotificationManager {
             userNotificationCenter.removePendingNotificationRequests(withIdentifiers: ids)
         }
 
+        #if !os(tvOS)
         userNotificationCenter.getDeliveredNotifications { [userNotificationCenter] notifications in
             let delivered = notifications.filter { $0.request.identifier.hasPrefix(prefix) }
             let ids = delivered.map(\.request.identifier)
             userNotificationCenter.removeDeliveredNotifications(withIdentifiers: ids)
         }
+        #endif
     }
 }
 
@@ -78,18 +85,22 @@ open class UserNotificationManager: AbstractNotificationManager {
 /// NOTE: The async 'didReceive' method has an internal threading issue. Completion must be on main thread.
 extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // Consider yielding UserNotification.Content instead of Payload…
+        #if !os(tvOS)
         let payload = notification.request.content.userInfo
         let metadata: Logger.Metadata = [
             "payload": .string(payload.json(redacting: redactions)),
         ]
         logger.debug("Presenting Notification", metadata: metadata)
         yieldTraffic(.presented(payload))
+        #endif
 
         DispatchQueue.main.async {
             completionHandler(UNNotificationPresentationOptions([.list, .banner, .sound, .badge]))
         }
     }
 
+    #if !os(tvOS)
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let payload = response.notification.request.content.userInfo
 
@@ -112,17 +123,12 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
             completionHandler()
         }
     }
+    #endif
 }
 
 // MARK: - Private Implementation
 
 private extension UserNotificationManager {
-    /// Register any custom actions that can be displayed with notifications.
-    func registerCategoriesAndActions() {
-        let notificationCategories = categories.map { UNNotificationCategory.make(with: $0) }
-        userNotificationCenter.setNotificationCategories(Set(notificationCategories))
-    }
-
     func getNotificationSettings() {
         userNotificationCenter.getNotificationSettings { [weak self] notificationSettings in
             guard let self else {
