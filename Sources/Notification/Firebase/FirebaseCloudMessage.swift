@@ -20,7 +20,7 @@ open class FirebaseCloudMessage: RemoteNotification, Codable {
         self.options = options
     }
 
-    open var payload: Payload {
+    open var userInfo: UserInfo {
         var content = Payload()
 
         if let notificationContent = aps.payload {
@@ -29,7 +29,7 @@ open class FirebaseCloudMessage: RemoteNotification, Codable {
             }
         }
         if let options {
-            content.merge(options.payload) { _, overwrite in
+            content.merge(options.userInfo) { _, overwrite in
                 overwrite
             }
         }

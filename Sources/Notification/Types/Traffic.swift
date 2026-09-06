@@ -1,9 +1,9 @@
 public enum Traffic {
-    case silent(Payload)
-    case presented(Payload)
+    case silent(UserInfo)
+    case presented(UserInfo)
     #if os(tvOS)
-    case interacted(Payload, ())
+    case interacted(UserInfo, ())
     #else
-    case interacted(Payload, UserNotification.Action)
+    case interacted(UserInfo, UserNotification.Action)
     #endif
 }

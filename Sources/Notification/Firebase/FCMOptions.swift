@@ -7,10 +7,7 @@ public struct FCMOptions: Hashable, Sendable, Codable {
         self.image = image
     }
 
-    @available(*, deprecated, renamed: "payload")
-    var notificationContent: Payload { payload }
-
-    var payload: Payload {
+    var userInfo: UserInfo {
         if let image {
             [
                 "fcm_options": [

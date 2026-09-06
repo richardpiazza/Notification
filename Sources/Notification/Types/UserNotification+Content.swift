@@ -23,7 +23,7 @@ public extension UserNotification {
         /// Apps can set the userInfo for locally scheduled notification requests.
         ///
         /// The contents of the push payload will be set as the userInfo for remote notifications.
-        public let payload: Payload
+        public let userInfo: UserInfo
 
         public init(
             attachments: [UserNotification.Attachment] = [],
@@ -35,7 +35,7 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            payload: Payload = Payload()
+            userInfo: UserInfo = UserInfo()
         ) {
             self.attachments = attachments
             self.badge = badge
@@ -46,7 +46,45 @@ public extension UserNotification {
             self.subtitle = subtitle
             self.threadIdentifier = threadIdentifier
             self.title = title
-            self.payload = payload
+            self.userInfo = userInfo
+        }
+
+        @available(*, deprecated, renamed: "init(attachments:badge:body:categoryId:launchImageName:sound:subtitle:threadIdentifier:title:userInfo:)")
+        public init(
+            attachments: [UserNotification.Attachment] = [],
+            badge: Int? = nil,
+            body: String = "",
+            categoryId: UserNotification.Category.ID = "",
+            launchImageName: String = "",
+            sound: UserNotification.Sound? = nil,
+            subtitle: String = "",
+            threadIdentifier: String = "",
+            title: String = "",
+            payload: Notification.Payload
+        ) {
+            self.attachments = attachments
+            self.badge = badge
+            self.body = body
+            self.categoryId = categoryId
+            self.launchImageName = launchImageName
+            self.sound = sound
+            self.subtitle = subtitle
+            self.threadIdentifier = threadIdentifier
+            self.title = title
+            userInfo = payload
+        }
+
+        @available(*, deprecated, renamed: "userInfo")
+        public var payload: Notification.Payload {
+            userInfo
+        }
+
+        public var aps: APS? {
+            guard let dictionary = userInfo["aps"] as? [String: Any] else {
+                return nil
+            }
+
+            return try? APS(dictionary: dictionary)
         }
     }
 }
@@ -66,7 +104,7 @@ extension UserNotification.Content: CustomDebugStringConvertible {
           subtitle: \(subtitle)
           threadIdentifier: \(threadIdentifier)
           title: \(title)
-          payload: \(payload.debugDescription)
+          userInfo: \(userInfo.debugDescription)
         }
         """
     }

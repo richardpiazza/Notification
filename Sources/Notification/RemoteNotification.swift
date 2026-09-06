@@ -3,5 +3,12 @@ public protocol RemoteNotification {
     var aps: APS { get }
 
     /// Dictionary representation of the notification.
-    var payload: Payload { get }
+    var userInfo: UserInfo { get }
+}
+
+public extension RemoteNotification {
+    @available(*, deprecated, renamed: "userInfo")
+    var payload: Payload {
+        userInfo
+    }
 }

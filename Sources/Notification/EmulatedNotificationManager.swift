@@ -62,13 +62,13 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
     }
 
     override public func localNotificationRequest(_ request: UserNotification.Request) throws {
-        let traffic: Traffic = if request.content.payload.aps?.isSilent == true {
-            .silent(request.content.payload)
+        let traffic: Traffic = if request.content.aps?.isSilent == true {
+            .silent(request.content.userInfo)
         } else {
             #if os(tvOS)
-            .interacted(request.content.payload, ())
+            .interacted(request.content.userInfo, ())
             #else
-            .interacted(request.content.payload, .default)
+            .interacted(request.content.userInfo, .default)
             #endif
         }
 

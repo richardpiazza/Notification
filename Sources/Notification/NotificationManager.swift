@@ -35,7 +35,7 @@ public protocol NotificationManager {
     /// will be interpreted as a `UIBackgroundFetchResult`.
     ///
     /// This can also be called at any point to propagate a notification payload through the service.
-    func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool
+    func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool
 
     /// Schedule a local notification to be presented.
     func localNotificationRequest(_ request: UserNotification.Request) throws

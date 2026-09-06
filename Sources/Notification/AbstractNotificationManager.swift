@@ -71,12 +71,12 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         logger.error("Remote Register Failed", metadata: metadata)
     }
 
-    public func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool {
+    public func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool {
         let metadata: Logger.Metadata = [
-            "payload": .string(payload.json(redacting: redactions)),
+            "payload": .string(userInfo.json(redacting: redactions)),
         ]
         logger.debug("Received Remote Notification", metadata: metadata)
-        yieldTraffic(.silent(payload))
+        yieldTraffic(.silent(userInfo))
         return true
     }
 

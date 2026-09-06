@@ -15,10 +15,10 @@ final class NotificationManagerTests: XCTestCase {
             self.category = category
         }
 
-        var payload: Payload {
-            var content = Payload()
+        var userInfo: UserInfo {
+            var content = UserInfo()
 
-            if let notificationContent = aps.payload {
+            if let notificationContent = aps.userInfo {
                 content.merge(notificationContent) { _, overwrite in
                     overwrite
                 }
@@ -58,16 +58,16 @@ final class NotificationManagerTests: XCTestCase {
             .store(in: &cancelStore)
 
         if let content = aps1.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
             try notificationManager.localNotificationRequest(request)
         }
 
         let aPush = APushNotification(aps: aps2, category: "Testing")
-        let request2 = UserNotification.Request(content: UserNotification.Content(payload: aPush.payload))
+        let request2 = UserNotification.Request(content: UserNotification.Content(userInfo: aPush.payload))
         try notificationManager.localNotificationRequest(request2)
 
         if let content = aps3.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
             try notificationManager.localNotificationRequest(request)
         }
 
@@ -95,17 +95,17 @@ final class NotificationManagerTests: XCTestCase {
             }
         }
 
-        if let content = aps1.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+        if let content = aps1.userInfo {
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
             try notificationManager.localNotificationRequest(request)
         }
 
         let aPush = APushNotification(aps: aps2, category: "Testing")
-        let request2 = UserNotification.Request(content: UserNotification.Content(payload: aPush.payload))
+        let request2 = UserNotification.Request(content: UserNotification.Content(userInfo: aPush.userInfo))
         try notificationManager.localNotificationRequest(request2)
 
-        if let content = aps3.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+        if let content = aps3.userInfo {
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
             try notificationManager.localNotificationRequest(request)
         }
 
@@ -129,18 +129,18 @@ final class NotificationManagerTests: XCTestCase {
 
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        if let payload = aps1.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+        if let payload = aps1.userInfo {
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
             try notificationManager.localNotificationRequest(request)
         }
 
-        if let payload = aps2.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+        if let payload = aps2.userInfo {
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
             try notificationManager.localNotificationRequest(request)
         }
 
-        if let payload = aps3.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(payload: payload))
+        if let payload = aps3.userInfo {
+            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
             try notificationManager.localNotificationRequest(request)
         }
 
