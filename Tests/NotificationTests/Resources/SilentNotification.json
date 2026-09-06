@@ -1,0 +1,7 @@
+{
+  "aps": {
+    "content-available": 1
+  },
+  "sync_type": "conflict_resolution",
+  "file_id": "file_abc123"
+}

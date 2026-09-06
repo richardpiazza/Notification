@@ -1,0 +1,12 @@
+{
+  "aps": {
+    "alert": {
+      "title": "New Document Shared",
+      "body": "Alice shared 'Q3_Report.pdf' with you."
+    },
+    "badge": 1,
+    "sound": "default"
+  },
+  "document_id": "doc_8675309",
+  "shared_by_user_id": "usr_123"
+}

@@ -1,0 +1,10 @@
+{
+  "aps": {
+    "alert": {
+      "title": "Meeting Request",
+      "body": "Bob wants to schedule a design review."
+    },
+    "category": "MEETING_INVITE_CATEGORY"
+  },
+  "meeting_id": "mtg_404"
+}

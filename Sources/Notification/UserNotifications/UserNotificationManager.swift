@@ -1,6 +1,6 @@
+#if canImport(UserNotifications)
 import Foundation
 import Logging
-#if canImport(UserNotifications)
 import UserNotifications
 
 open class UserNotificationManager: AbstractNotificationManager {

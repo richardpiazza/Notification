@@ -6,10 +6,11 @@ import Combine
 /// Manager that handles all interactions with push/local notifications.
 public protocol NotificationManager {
     /// Indicates the current authorization of the resources.
-    @available(*, deprecated, message: "Syncronous access should be avoided.", renamed: "authorizationStream()")
+    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
     var authorization: AuthorizationStatus { get }
 
     /// Custom categories and actions.
+    @available(*, deprecated, message: "Implementation Detail")
     var categories: [UserNotification.Category] { get }
 
     /// Requests authorization from the system to be allowed to display notifications.
@@ -74,7 +75,7 @@ public protocol NotificationManager {
 }
 
 public extension NotificationManager {
-    @available(*, deprecated, message: "Syncronous access should be avoided.", renamed: "authorizationStream()")
+    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
     var authorized: Bool { authorization == .authorized }
 
     /// Requests authorization only when status is `.notDetermined`.

@@ -1,0 +1,12 @@
+{
+  "aps": {
+    "alert": {
+      "title": "New Photo Uploaded",
+      "body": "Check out this sunset!"
+    },
+    "mutable-content": 1,
+    "sound": "default"
+  },
+  "media_url": "https://example.com/images/sunset.jpg",
+  "album_id": "album_99"
+}
