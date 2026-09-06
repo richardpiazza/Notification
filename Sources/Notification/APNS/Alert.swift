@@ -3,19 +3,7 @@ import Foundation
 /// Push Notification Alert Content
 ///
 /// [Localization of Content](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW9)
-public struct Alert: Codable, Equatable {
-
-    enum CodingKeys: String, CodingKey {
-        case title
-        case body
-        case titleLocalizationKey = "title-loc-key"
-        case titleLocalizationArguments = "title-loc-args"
-        case bodyLocalizationKey = "loc-key"
-        case bodyLocalizationArguments = "loc-arg"
-        case actionLocalizationKey = "action-loc-key"
-        case launchImage = "launch-image"
-    }
-
+public struct Alert: Hashable, Sendable {
     /// A short string describing the purpose of the notification.
     ///
     /// Apple Watch displays this string as part of the notification interface.
@@ -71,5 +59,18 @@ public struct Alert: Codable, Equatable {
         self.bodyLocalizationArguments = bodyLocalizationArguments
         self.actionLocalizationKey = actionLocalizationKey
         self.launchImage = launchImage
+    }
+}
+
+extension Alert: Codable {
+    enum CodingKeys: String, CodingKey {
+        case title
+        case body
+        case titleLocalizationKey = "title-loc-key"
+        case titleLocalizationArguments = "title-loc-args"
+        case bodyLocalizationKey = "loc-key"
+        case bodyLocalizationArguments = "loc-arg"
+        case actionLocalizationKey = "action-loc-key"
+        case launchImage = "launch-image"
     }
 }

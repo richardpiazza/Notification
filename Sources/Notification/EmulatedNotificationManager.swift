@@ -65,7 +65,11 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
         let traffic: Traffic = if request.content.payload.aps?.isSilent == true {
             .silent(request.content.payload)
         } else {
+            #if os(tvOS)
+            .interacted(request.content.payload, ())
+            #else
             .interacted(request.content.payload, .default)
+            #endif
         }
 
         yieldTraffic(traffic)

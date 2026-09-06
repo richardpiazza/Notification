@@ -1,7 +1,8 @@
-import Foundation
+import AsyncPlus
 #if canImport(Combine)
 import Combine
 #endif
+import Foundation
 import Logging
 
 /// Notification manager that is pre-configured with support for Combine Publishers and Async Streams.
@@ -10,24 +11,25 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     #if canImport(Combine)
     public let authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never>
     public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
-    public var authorization: AuthorizationStatus { authorizationSubject.value }
 
     public let apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
     public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
 
-    public let trafficSubject: PassthroughSubject<Traffic, Never> = .init()
+    public let trafficSubject: PassthroughSubject<Traffic, Never> = PassthroughSubject()
     public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
-    #else
-    public private(set) var authorization: AuthorizationStatus
     #endif
 
-    public private(set) var authorizationSubjects: [UUID: AsyncStream<AuthorizationStatus>.Continuation] = [:]
-    public private(set) var apnsTokenSubjects: [UUID: AsyncStream<Data?>.Continuation] = [:]
-    public private(set) var trafficSubjects: [UUID: AsyncStream<Traffic>.Continuation] = [:]
+    private let authorizationCurrentValueSubject: CurrentValueAsyncSubject<AuthorizationStatus>
+    private let pushTokenCurrentValueSubject: CurrentValueAsyncSubject<Data?> = CurrentValueAsyncSubject(nil)
+    private let trafficPassthroughValueSubject: PassthroughAsyncSubject<Traffic> = PassthroughAsyncSubject()
 
     public private(set) var categories: [UserNotification.Category]
     public private(set) var redactions: [String]
     public let logger: Logger = .notification
+
+    public var authorization: AuthorizationStatus {
+        authorizationCurrentValueSubject.value
+    }
 
     ///
     /// - parameters:
@@ -40,10 +42,9 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         redactions: [String] = []
     ) {
         #if canImport(Combine)
-        authorizationSubject = .init(authorizationStatus)
-        #else
-        authorization = authorizationStatus
+        authorizationSubject = CurrentValueSubject(authorizationStatus)
         #endif
+        authorizationCurrentValueSubject = CurrentValueAsyncSubject(authorizationStatus)
         self.categories = categories
         self.redactions = redactions
         super.init()
@@ -92,33 +93,15 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     }
 
     public func authorizationStream() -> AsyncStream<AuthorizationStatus> {
-        let id = UUID()
-        let stream = AsyncStream.makeStream(of: AuthorizationStatus.self)
-        stream.continuation.onTermination = { [weak self] termination in
-            self?.authorizationSubjects[id] = nil
-        }
-        authorizationSubjects[id] = stream.continuation
-        return stream.stream
+        authorizationCurrentValueSubject.sink()
     }
 
     public func apnsTokenStream() -> AsyncStream<Data?> {
-        let id = UUID()
-        let stream = AsyncStream.makeStream(of: Data?.self)
-        stream.continuation.onTermination = { [weak self] termination in
-            self?.apnsTokenSubjects[id] = nil
-        }
-        apnsTokenSubjects[id] = stream.continuation
-        return stream.stream
+        pushTokenCurrentValueSubject.sink()
     }
 
     public func trafficStream() -> AsyncStream<Traffic> {
-        let id = UUID()
-        let stream = AsyncStream.makeStream(of: Traffic.self)
-        stream.continuation.onTermination = { [weak self] termination in
-            self?.trafficSubjects[id] = nil
-        }
-        trafficSubjects[id] = stream.continuation
-        return stream.stream
+        trafficPassthroughValueSubject.sink()
     }
 }
 
@@ -126,29 +109,21 @@ public extension AbstractNotificationManager {
     final func yieldAuthorizationStatus(_ authorizationStatus: AuthorizationStatus) {
         #if canImport(Combine)
         authorizationSubject.send(authorizationStatus)
-        #else
-        authorization = authorizationStatus
         #endif
-        for (_, continuation) in authorizationSubjects {
-            continuation.yield(authorizationStatus)
-        }
+        authorizationCurrentValueSubject.yield(authorizationStatus)
     }
 
     final func yieldAPNSTokenData(_ token: Data) {
         #if canImport(Combine)
         apnsTokenSubject.send(token)
         #endif
-        for (_, continuation) in apnsTokenSubjects {
-            continuation.yield(token)
-        }
+        pushTokenCurrentValueSubject.yield(token)
     }
 
     final func yieldTraffic(_ traffic: Traffic) {
         #if canImport(Combine)
         trafficSubject.send(traffic)
         #endif
-        for (_, continuation) in trafficSubjects {
-            continuation.yield(traffic)
-        }
+        trafficPassthroughValueSubject.yield(traffic)
     }
 }

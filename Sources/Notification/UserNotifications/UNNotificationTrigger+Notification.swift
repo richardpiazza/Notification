@@ -45,19 +45,5 @@ public extension UNNotificationTrigger {
             throw CocoaError(.featureUnsupported)
         }
     }
-
-    @available(*, deprecated, renamed: "UserNotification.Trigger.make(with:)")
-    var trigger: UserNotification.Trigger {
-        switch self {
-        case let value as UNCalendarNotificationTrigger:
-            UserNotification.Trigger(event: .calendar(value.dateComponents), repeats: value.repeats)
-        case let value as UNTimeIntervalNotificationTrigger:
-            UserNotification.Trigger(event: .timeInterval(value.timeInterval), repeats: value.repeats)
-        case let value as UNPushNotificationTrigger:
-            UserNotification.Trigger(event: .push, repeats: value.repeats)
-        default:
-            UserNotification.Trigger(repeats: repeats)
-        }
-    }
 }
 #endif

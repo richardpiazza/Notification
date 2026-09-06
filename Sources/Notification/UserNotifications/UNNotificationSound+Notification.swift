@@ -1,39 +1,31 @@
-#if canImport(UserNotifications)
+#if canImport(UserNotifications) && !os(tvOS)
 import UserNotifications
-
-public extension UserNotification.Sound {
-    @available(*, deprecated, renamed: "UNNotificationSound.make(with:)")
-    var unNotificationSound: UNNotificationSound {
-        switch self {
-        case .named(let name):
-            .init(named: .init(rawValue: name))
-        case .critical(let name, let volume) where name != nil && volume != nil:
-            .criticalSoundNamed(.init(rawValue: name!), withAudioVolume: volume!)
-        case .critical(let name, let volume) where name != nil && volume == nil:
-            .criticalSoundNamed(.init(rawValue: name!))
-        case .critical(let name, let volume) where name == nil && volume != nil:
-            .defaultCriticalSound(withAudioVolume: volume!)
-        case .critical(let name, let volume) where name == nil && volume == nil:
-            .defaultCritical
-        default:
-            .default
-        }
-    }
-}
 
 public extension UNNotificationSound {
     static func make(with notificationSound: UserNotification.Sound) -> UNNotificationSound {
         switch notificationSound {
         case .critical(.some(let name), .some(let volume)):
+            #if os(watchOS)
+            .defaultCriticalSound(withAudioVolume: volume)
+            #else
             .criticalSoundNamed(UNNotificationSoundName(name), withAudioVolume: volume)
+            #endif
         case .critical(.some(let name), .none):
+            #if os(watchOS)
+            .defaultCritical
+            #else
             .criticalSoundNamed(UNNotificationSoundName(name))
+            #endif
         case .critical(.none, .some(let volume)):
             .defaultCriticalSound(withAudioVolume: volume)
         case .critical(.none, .none):
             .defaultCritical
         case .named(let name):
-            .init(named: UNNotificationSoundName(name))
+            #if os(watchOS)
+            fallthrough
+            #else
+            UNNotificationSound(named: UNNotificationSoundName(name))
+            #endif
         default:
             .default
         }

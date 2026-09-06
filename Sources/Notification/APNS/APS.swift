@@ -3,17 +3,7 @@ import Foundation
 /// Content specific to **Apple Push Services**.
 ///
 /// [Payload Key Reference](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html#//apple_ref/doc/uid/TP40008194-CH17-SW1)
-public struct APS: Codable, Equatable {
-
-    enum CodingKeys: String, CodingKey {
-        case alert
-        case badge
-        case sound
-        case contentAvailable = "content-available"
-        case category
-        case threadId = "thread-id"
-    }
-
+public struct APS: Hashable, Sendable {
     /// Include this key when you want the system to display a standard alert or a banner.
     ///
     /// The notification settings for your app on the user’s device determine whether an alert or banner is displayed.
@@ -61,6 +51,17 @@ public struct APS: Codable, Equatable {
         self.category = category
         self.threadId = threadId
     }
+}
+
+extension APS: Codable {
+    enum CodingKeys: String, CodingKey {
+        case alert
+        case badge
+        case sound
+        case contentAvailable = "content-available"
+        case category
+        case threadId = "thread-id"
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -90,7 +91,7 @@ public extension APS {
             return nil
         }
 
-        guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: .init()) else {
+        guard let dictionary = try? JSONSerialization.jsonObject(with: data) else {
             return nil
         }
 
@@ -107,7 +108,7 @@ public extension Payload {
             return nil
         }
 
-        guard let data = try? JSONSerialization.data(withJSONObject: dictionary, options: .init()) else {
+        guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
             return nil
         }
 

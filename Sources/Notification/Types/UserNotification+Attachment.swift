@@ -1,7 +1,7 @@
 import Foundation
 
 public extension UserNotification {
-    struct Attachment: Identifiable {
+    struct Attachment: Hashable, Sendable, Identifiable {
         /// The identifier of this attachment
         public let id: String
         /// The URL to the attachment's data.

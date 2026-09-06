@@ -1,4 +1,4 @@
-#if canImport(UserNotifications)
+#if canImport(UserNotifications) && !os(tvOS)
 import UserNotifications
 
 public extension UserNotification.Attachment {
@@ -9,13 +9,6 @@ public extension UserNotification.Attachment {
             type: attachment.type
         )
     }
-
-    @available(*, deprecated, renamed: "UserNotification.Attachment.make(with:)")
-    init(_ attachment: UNNotificationAttachment) {
-        id = attachment.identifier
-        url = attachment.url
-        type = attachment.type
-    }
 }
 
 public extension UNNotificationAttachment {
@@ -24,24 +17,6 @@ public extension UNNotificationAttachment {
             identifier: attachment.id,
             url: attachment.url,
             options: nil
-        )
-    }
-
-    @available(*, deprecated, renamed: "UNNotificationAttachment.make(with:)")
-    convenience init(_ attachment: UserNotification.Attachment) throws {
-        try self.init(
-            identifier: attachment.id,
-            url: attachment.url,
-            options: nil
-        )
-    }
-
-    @available(*, deprecated, renamed: "UserNotification.Attachment.make(with:)")
-    var notificationUserNotificationAttachment: UserNotification.Attachment {
-        UserNotification.Attachment(
-            id: identifier,
-            url: url,
-            type: type
         )
     }
 }

@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
+      "identity" : "asyncplus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/richardpiazza/AsyncPlus.git",
+      "state" : {
+        "revision" : "2526ed4bf81983fa4078380e088e692ca201416f",
+        "version" : "0.5.0"
+      }
+    },
+    {
       "identity" : "harness",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/richardpiazza/Harness.git",
       "state" : {
-        "revision" : "0fffad21894b52349c84dfdccb7e31e07019655f",
-        "version" : "1.2.0"
+        "revision" : "30c3a1adb227e11d1472db066fc3b74c3b29e18a",
+        "version" : "1.2.1"
       }
     },
     {
@@ -14,8 +23,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
-        "version" : "1.6.1"
+        "revision" : "3ffafb9722d5d918c614feb496c8789a3b59d222",
+        "version" : "1.15.0"
+      }
+    },
+    {
+      "identity" : "swift-mutex",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swhitty/swift-mutex.git",
+      "state" : {
+        "revision" : "1770152df756b54c28ef1787df1e957d93cc62d5",
+        "version" : "0.0.6"
       }
     }
   ],

@@ -6,9 +6,11 @@ import Combine
 /// Manager that handles all interactions with push/local notifications.
 public protocol NotificationManager {
     /// Indicates the current authorization of the resources.
+    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
     var authorization: AuthorizationStatus { get }
 
     /// Custom categories and actions.
+    @available(*, deprecated, message: "Implementation Detail")
     var categories: [UserNotification.Category] { get }
 
     /// Requests authorization from the system to be allowed to display notifications.
@@ -47,9 +49,11 @@ public protocol NotificationManager {
 
     #if canImport(Combine)
     /// Publisher that emits changes to the `AuthorizationStatus`.
+    @available(*, deprecated, renamed: "authorizationStream()")
     var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { get }
 
     /// Publisher that emits changes to the APNS token.
+    @available(*, deprecated, renamed: "apnsTokenStream()")
     var apnsTokenPublisher: AnyPublisher<Data?, Never> { get }
 
     /// Publisher that emits the content of all notifications received.
@@ -57,6 +61,7 @@ public protocol NotificationManager {
     /// Content published here can be duplicated, as notifications are processed multiple times:
     /// * First when being presented (i.e. banner)
     /// * Second when a banner is interacted with (i.e. tapped)
+    @available(*, deprecated, renamed: "trafficStream()")
     var trafficPublisher: AnyPublisher<Traffic, Never> { get }
 
     /// Publisher that emits `PushNotification`s.
@@ -64,22 +69,51 @@ public protocol NotificationManager {
     /// This publisher emits under the following conditions:
     /// * Notification is **silent**
     /// * Notification is **interacted with in the foreground**.
-    func remoteNotificationPublisher<T>(decoder: JSONDecoder) -> AnyPublisher<T, Never> where T: RemoteNotification & Decodable
+    @available(*, deprecated)
+    func remoteNotificationPublisher<T: RemoteNotification & Decodable>(decoder: JSONDecoder) -> AnyPublisher<T, Never>
     #endif
 }
 
 public extension NotificationManager {
+    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
     var authorized: Bool { authorization == .authorized }
 
     /// Requests authorization only when status is `.notDetermined`.
+    @available(*, deprecated)
     func requestAuthorizationIfNeeded() {
         if case .notDetermined = authorization {
             requestAuthorization()
         }
     }
 
+    func remoteNotificationStream<T: RemoteNotification & Decodable>(decoder: JSONDecoder = JSONDecoder()) -> AsyncStream<T> {
+        let stream = AsyncStream.makeStream(of: T.self)
+
+        let task = Task {
+            for await value in trafficStream() {
+                switch value {
+                case .silent(let payload), .interacted(let payload, _):
+                    do {
+                        let data = try JSONSerialization.data(withJSONObject: payload)
+                        let notification = try decoder.decode(T.self, from: data)
+                        stream.continuation.yield(notification)
+                    } catch {}
+                default:
+                    break
+                }
+            }
+        }
+
+        stream.continuation.onTermination = { _ in
+            task.cancel()
+        }
+
+        return stream.stream
+    }
+
     #if canImport(Combine)
-    func remoteNotificationPublisher<T>(decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Never> where T: RemoteNotification & Decodable {
+    @available(*, deprecated)
+    func remoteNotificationPublisher<T: RemoteNotification & Decodable>(decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Never> {
         trafficPublisher
             // `Payload` from '.silent' and '.interacted' only.
             .compactMap { traffic in
@@ -94,7 +128,7 @@ public extension NotificationManager {
             .flatMap { payload in
                 Just(payload)
                     .tryMap {
-                        try JSONSerialization.data(withJSONObject: $0, options: .init())
+                        try JSONSerialization.data(withJSONObject: $0)
                     }
                     .decode(type: T.self, decoder: decoder)
                     .tryMap {

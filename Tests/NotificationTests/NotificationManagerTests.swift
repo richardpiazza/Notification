@@ -40,6 +40,7 @@ final class NotificationManagerTests: XCTestCase {
     #if canImport(Combine)
     private var cancelStore: [AnyCancellable] = []
 
+    @available(*, deprecated)
     func testPushNotificationPublisher() throws {
         var contentReceived: Int = 0
         var notificationsReceived: Int = 0
@@ -76,6 +77,46 @@ final class NotificationManagerTests: XCTestCase {
         XCTAssertEqual(notificationsReceived, 1)
     }
     #endif
+
+    func testRemoteNotificationStream() async throws {
+        var contentReceived: Int = 0
+        var notificationsReceived: Int = 0
+
+        let trafficTask = Task {
+            for await _ in notificationManager.trafficStream() {
+                contentReceived += 1
+            }
+        }
+
+        let notificationTask = Task {
+            let stream: AsyncStream<APushNotification> = notificationManager.remoteNotificationStream()
+            for await _ in stream {
+                notificationsReceived += 1
+            }
+        }
+
+        if let content = aps1.payload {
+            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+            try notificationManager.localNotificationRequest(request)
+        }
+
+        let aPush = APushNotification(aps: aps2, category: "Testing")
+        let request2 = UserNotification.Request(content: UserNotification.Content(payload: aPush.payload))
+        try notificationManager.localNotificationRequest(request2)
+
+        if let content = aps3.payload {
+            let request = UserNotification.Request(content: UserNotification.Content(payload: content))
+            try notificationManager.localNotificationRequest(request)
+        }
+
+        try await Task.sleep(for: .milliseconds(1500))
+
+        XCTAssertEqual(contentReceived, 3)
+        XCTAssertEqual(notificationsReceived, 1)
+
+        trafficTask.cancel()
+        notificationTask.cancel()
+    }
 
     func testTrafficStream() async throws {
         let subscription1 = Task {

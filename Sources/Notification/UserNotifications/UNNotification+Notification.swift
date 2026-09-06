@@ -8,11 +8,5 @@ public extension UserNotification {
             request: UserNotification.Request.make(with: notification.request)
         )
     }
-
-    @available(*, deprecated, renamed: "UserNotification.make(with:)")
-    init(_ notification: UNNotification) {
-        date = notification.date
-        request = .init()
-    }
 }
 #endif

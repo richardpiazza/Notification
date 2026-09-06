@@ -1,16 +1,16 @@
 import Foundation
 
 public extension UserNotification {
-    struct Action: Codable, Identifiable {
-        // The unique identifier for this action.
+    struct Action: Hashable, Sendable, Identifiable, Codable {
+        /// The unique identifier for this action.
         public let id: String
-        // The title to display for this action.
+        /// The title to display for this action.
         public let title: String
-        // Whether this action should require unlocking before being performed.
+        /// Whether this action should require unlocking before being performed.
         public let authenticationRequired: Bool
-        // Whether this action should be indicated as destructive.
+        /// Whether this action should be indicated as destructive.
         public let destructive: Bool
-        // Whether this action should cause the application to launch in the foreground.
+        /// Whether this action should cause the application to launch in the foreground.
         public let foreground: Bool
 
         public init(
@@ -26,21 +26,6 @@ public extension UserNotification {
             self.destructive = destructive
             self.foreground = foreground
         }
-    }
-}
-
-extension UserNotification.Action: CustomStringConvertible {
-    @available(*, deprecated, renamed: "debugDescription")
-    public var description: String {
-        """
-        UserNotification.Action {
-            id: \(id)
-            title: \(title)
-            authenticationRequired: \(authenticationRequired ? "YES" : "NO")
-            destructive: \(destructive ? "YES" : "NO")
-            foreground: \(foreground ? "YES" : "NO")
-        }
-        """
     }
 }
 

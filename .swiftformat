@@ -10,6 +10,9 @@
 # Rules
 --disable blankLinesAtStartOfScope
 --disable hoistPatternLet
+--disable redundantPublic
 --disable redundantType
+--disable swiftTestingTestCaseNames
 --disable unusedArguments
 --disable wrapArguments
+--disable wrapPropertyBodies
