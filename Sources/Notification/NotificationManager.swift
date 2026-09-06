@@ -94,7 +94,7 @@ public extension NotificationManager {
                 switch value {
                 case .silent(let payload), .interacted(let payload, _):
                     do {
-                        let data = try JSONSerialization.data(withJSONObject: payload)
+                        let data = try JSONSerialization.data(withJSONObject: payload.userInfo)
                         let notification = try decoder.decode(T.self, from: data)
                         stream.continuation.yield(notification)
                     } catch {}
@@ -119,14 +119,14 @@ public extension NotificationManager {
             .compactMap { traffic in
                 switch traffic {
                 case .silent(let payload), .interacted(let payload, _):
-                    payload
+                    payload.userInfo
                 default:
                     nil
                 }
             }
-            // Decode `Payload` to `T`
-            .flatMap { payload in
-                Just(payload)
+            // Decode `UserInfo` to `T`
+            .flatMap { userInfo in
+                Just(userInfo)
                     .tryMap {
                         try JSONSerialization.data(withJSONObject: $0)
                     }

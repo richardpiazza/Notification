@@ -87,9 +87,10 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         // Consider yielding UserNotification.Content instead of Payload…
         #if !os(tvOS)
-        let payload = notification.request.content.userInfo
+        let userInfo = notification.request.content.userInfo
+        let payload = (try? UserNotification.Payload(userInfo: userInfo)) ?? [:]
         let metadata: Logger.Metadata = [
-            "payload": .string(payload.json(redacting: redactions)),
+            "payload": .dictionary(payload.metadata.redacting(keyPaths: redactions)),
         ]
         logger.debug("Presenting Notification", metadata: metadata)
         yieldTraffic(.presented(payload))
@@ -102,7 +103,8 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
 
     #if !os(tvOS)
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let payload = response.notification.request.content.userInfo
+        let userInfo = response.notification.request.content.userInfo
+        let payload = (try? UserNotification.Payload(userInfo: userInfo)) ?? [:]
 
         let action: UserNotification.Action = switch response.actionIdentifier {
         case UNNotificationDefaultActionIdentifier:
@@ -114,7 +116,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
         }
 
         let metadata: Logger.Metadata = [
-            "payload": .string(payload.json(redacting: redactions)),
+            "payload": .dictionary(payload.metadata.redacting(keyPaths: redactions)),
         ]
         logger.debug("Interacted With Notification", metadata: metadata)
         yieldTraffic(.interacted(payload, action))

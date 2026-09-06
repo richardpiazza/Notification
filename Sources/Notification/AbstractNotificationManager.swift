@@ -56,9 +56,9 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
 
     public func didRegisterForRemoteNotificationsWithDeviceToken(_ token: Data) {
         let hex = token.map { String(format: "%.2hhx", $0) }.joined()
-        let content: [AnyHashable: Any] = ["hex": hex]
+        let content: Logger.Metadata = ["hex": .string(hex)]
         let metadata: Logger.Metadata = [
-            "apnsToken": .string(content.json(redacting: redactions)),
+            "apnsToken": .dictionary(content.redacting(keyPaths: redactions)),
         ]
         logger.debug("Registered for Remote Notifications", metadata: metadata)
         yieldAPNSTokenData(token)
@@ -72,11 +72,12 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     }
 
     public func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool {
+        let payload = try UserNotification.Payload(userInfo: userInfo)
         let metadata: Logger.Metadata = [
-            "payload": .string(userInfo.json(redacting: redactions)),
+            "payload": .dictionary(payload.metadata.redacting(keyPaths: redactions)),
         ]
         logger.debug("Received Remote Notification", metadata: metadata)
-        yieldTraffic(.silent(userInfo))
+        yieldTraffic(.silent(payload))
         return true
     }
 
