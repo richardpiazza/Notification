@@ -1,4 +1,4 @@
-/* 
+/*
  # CustomDataNotification
 
  This is a standard visible notification. The user sees an alert banner and a badge, while the app
