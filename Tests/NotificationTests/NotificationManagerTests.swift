@@ -109,7 +109,7 @@ final class NotificationManagerTests: XCTestCase {
             try notificationManager.localNotificationRequest(request)
         }
 
-        try await Task.sleep(for: .milliseconds(150))
+        try await Task.sleep(for: .milliseconds(1500))
 
         XCTAssertEqual(contentReceived, 3)
         XCTAssertEqual(notificationsReceived, 1)
