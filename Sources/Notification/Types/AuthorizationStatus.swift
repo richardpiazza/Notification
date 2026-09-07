@@ -2,7 +2,7 @@
 public typealias NotificationAuthorizationStatus = AuthorizationStatus
 
 /// Indication of whether an app is allowed to schedule notifications.
-public enum AuthorizationStatus: Codable {
+public enum AuthorizationStatus: Hashable, Sendable, Codable {
     /// The user has not yet made a choice regarding whether the application may post user notifications.
     case notDetermined
     /// The application is not authorized to post user notifications.

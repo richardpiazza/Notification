@@ -52,8 +52,7 @@ struct NotificationManagerTests {
                 payload: aps1.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
-
+        try await notificationManager.localNotificationRequest(request)
         try await Task.sleep(for: .milliseconds(150))
 
         let aPush = APushNotification(aps: aps2, category: "Testing")
@@ -62,8 +61,7 @@ struct NotificationManagerTests {
                 payload: aPush.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
-
+        try await notificationManager.localNotificationRequest(request)
         try await Task.sleep(for: .milliseconds(150))
 
         request = UserNotification.Request(
@@ -71,8 +69,7 @@ struct NotificationManagerTests {
                 payload: aps3.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
-
+        try await notificationManager.localNotificationRequest(request)
         try await Task.sleep(for: .seconds(1.5))
 
         #expect(contentReceived == 3)
@@ -94,13 +91,13 @@ struct NotificationManagerTests {
         try await Task.sleep(for: .seconds(1))
 
         var request = UserNotification.Request(content: UserNotification.Content(payload: aps1.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         request = UserNotification.Request(content: UserNotification.Content(payload: aps2.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         request = UserNotification.Request(content: UserNotification.Content(payload: aps3.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         try await Task.sleep(for: .seconds(1))
 

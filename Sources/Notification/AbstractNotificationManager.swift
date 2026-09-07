@@ -3,6 +3,7 @@ import Foundation
 import Logging
 
 /// A pre-configured Notification Manager.
+@available(*, deprecated)
 open class AbstractNotificationManager: NSObject, NotificationManager {
 
     private let authorizationCurrentValueSubject: CurrentValueAsyncSubject<AuthorizationStatus>
@@ -13,6 +14,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     public private(set) var redactions: [String]
     public let logger: Logger = .notification
 
+    @available(*, deprecated)
     public var authorization: AuthorizationStatus {
         authorizationCurrentValueSubject.value
     }
@@ -80,7 +82,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         authorizationCurrentValueSubject.sink()
     }
 
-    public func apnsTokenStream() -> AsyncStream<Data?> {
+    public func pushTokenStream() -> AsyncStream<Data?> {
         pushTokenCurrentValueSubject.sink()
     }
 
@@ -89,6 +91,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     }
 }
 
+@available(*, deprecated)
 public extension AbstractNotificationManager {
     final func yieldAuthorizationStatus(_ authorizationStatus: AuthorizationStatus) {
         authorizationCurrentValueSubject.yield(authorizationStatus)

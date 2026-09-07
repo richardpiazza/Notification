@@ -2,16 +2,8 @@ import Foundation
 
 /// Manager that handles all interactions with push/local notifications.
 public protocol NotificationManager {
-    /// Indicates the current authorization of the resources.
-    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
-    var authorization: AuthorizationStatus { get }
-
-    /// Custom categories and actions.
-    @available(*, deprecated, message: "Implementation Detail")
-    var categories: [UserNotification.Category] { get }
-
     /// Requests authorization from the system to be allowed to display notifications.
-    func requestAuthorization()
+    func requestAuthorization() async
 
     /// Proxy used by the `UIApplicationDelegate`
     ///
@@ -35,16 +27,16 @@ public protocol NotificationManager {
     func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool
 
     /// Schedule a local notification to be presented.
-    func localNotificationRequest(_ request: UserNotification.Request) throws
+    func localNotificationRequest(_ request: UserNotification.Request) async throws
 
     func removePendingAndDeliveredNotifications(withId id: String)
-    func removePendingAndDeliveredNotifications(withPrefix prefix: String)
+    func removePendingAndDeliveredNotifications(withPrefix prefix: String) async
 
     /// AsyncStream which emits changes to the `AuthorizationStatus`.
     func authorizationStream() -> AsyncStream<AuthorizationStatus>
 
-    /// AsyncStream which emits changes to the APNS token.
-    func apnsTokenStream() -> AsyncStream<Data?>
+    /// AsyncStream which emits changes to the Push Notification token.
+    func pushTokenStream() -> AsyncStream<Data?>
 
     /// AsyncStream which emits the content of all notifications received.
     ///
@@ -55,15 +47,9 @@ public protocol NotificationManager {
 }
 
 public extension NotificationManager {
-    @available(*, deprecated, message: "Synchronous access should be avoided.", renamed: "authorizationStream()")
-    var authorized: Bool { authorization == .authorized }
-
-    /// Requests authorization only when status is `.notDetermined`.
-    @available(*, deprecated)
-    func requestAuthorizationIfNeeded() {
-        if case .notDetermined = authorization {
-            requestAuthorization()
-        }
+    @available(*, deprecated, renamed: "pushTokenStream")
+    func apnsTokenStream() -> AsyncStream<Data?> {
+        pushTokenStream()
     }
 
     /// AsyncStream which emits `RemoteNotification`s.

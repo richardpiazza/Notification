@@ -1,9 +1,15 @@
+import AsyncPlus
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import Harness
+import Logging
 
-open class EmulatedNotificationManager: AbstractNotificationManager {
+public final class EmulatedNotificationManager: NotificationManager, Sendable {
 
-    public enum AuthorizationBehavior: Codable {
+    public enum AuthorizationBehavior: Hashable, Sendable, Codable {
         /// Transitions to an authorized state.
         ///
         /// * `authorization` is set to `.authorized`
@@ -29,39 +35,73 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
         }
     }
 
-    public var authorizationBehavior: AuthorizationBehavior
+    private let logger: Logger = .notification
+    private let authorizationCurrentValueSubject: CurrentValueAsyncSubject<AuthorizationStatus>
+    private let pushTokenCurrentValueSubject: CurrentValueAsyncSubject<Data?> = CurrentValueAsyncSubject(nil)
+    private let trafficPassthroughValueSubject: PassthroughAsyncSubject<Traffic> = PassthroughAsyncSubject()
+    private let authorizationBehavior: AuthorizationBehavior
 
     public init(
         authorization: AuthorizationStatus = .notDetermined,
         authorizationBehavior: AuthorizationBehavior = .failure,
     ) {
+        authorizationCurrentValueSubject = CurrentValueAsyncSubject(authorization)
         self.authorizationBehavior = authorizationBehavior
-        super.init(authorizationStatus: authorization)
     }
 
     public init(configuration: Configuration) {
+        authorizationCurrentValueSubject = CurrentValueAsyncSubject(configuration.authorization ?? .notDetermined)
         authorizationBehavior = configuration.authorizationBehavior ?? .failure
-        super.init(authorizationStatus: configuration.authorization ?? .notDetermined)
     }
 
-    override public func requestAuthorization() {
+    public func requestAuthorization() async {
+        let status = authorizationCurrentValueSubject.value
+
         switch authorizationBehavior {
         case .success:
-            guard authorization != .authorized else {
+            guard status != .authorized else {
                 return
             }
 
-            yieldAuthorizationStatus(.authorized)
+            logger.info("Notifications Authorized")
+            authorizationCurrentValueSubject.yield(.authorized)
         case .failure:
-            guard authorization != .denied else {
+            guard status != .denied else {
                 return
             }
 
-            yieldAuthorizationStatus(.denied)
+            logger.warning("Notifications Denied")
+            authorizationCurrentValueSubject.yield(.denied)
         }
     }
 
-    override public func localNotificationRequest(_ request: UserNotification.Request) throws {
+    public func didRegisterForRemoteNotificationsWithDeviceToken(_ token: Data) {
+        let hex = token.map { String(format: "%.2hhx", $0) }.joined()
+        logger.debug(
+            "Remote Notification Registration Successful",
+            metadata: ["push-token": .string(hex)],
+        )
+    }
+
+    public func didFailToRegisterForRemoteNotificationsWithError(_ error: any Error) {
+        logger.error("Remote Notification Registration Failed", metadata: [
+            NSLocalizedDescriptionKey: .string(error.localizedDescription),
+        ])
+    }
+
+    public func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool {
+        let payload = try Payload(userInfo: userInfo)
+        logger.debug(
+            "Received Remote Notification",
+            metadata: ["payload": .dictionary(payload.metadata)],
+        )
+
+        trafficPassthroughValueSubject.yield(.silent(payload))
+
+        return true
+    }
+
+    public func localNotificationRequest(_ request: UserNotification.Request) async throws {
         let payload = request.content.payload
         let aps: APS? = if case .dictionary(let apsPayload) = payload["aps"] {
             try APS(payload: apsPayload)
@@ -79,10 +119,22 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
             #endif
         }
 
-        yieldTraffic(traffic)
+        trafficPassthroughValueSubject.yield(traffic)
     }
 
-    override public func removePendingAndDeliveredNotifications(withId id: String) {}
+    public func removePendingAndDeliveredNotifications(withId id: String) {}
 
-    override public func removePendingAndDeliveredNotifications(withPrefix prefix: String) {}
+    public func removePendingAndDeliveredNotifications(withPrefix prefix: String) {}
+
+    public func authorizationStream() -> AsyncStream<AuthorizationStatus> {
+        authorizationCurrentValueSubject.sink()
+    }
+
+    public func pushTokenStream() -> AsyncStream<Data?> {
+        pushTokenCurrentValueSubject.sink()
+    }
+
+    public func trafficStream() -> AsyncStream<Traffic> {
+        trafficPassthroughValueSubject.sink()
+    }
 }
