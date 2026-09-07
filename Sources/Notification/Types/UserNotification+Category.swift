@@ -8,7 +8,7 @@ public extension UserNotification {
 
         public init(
             id: String = UUID().uuidString,
-            actions: [Action] = []
+            actions: [Action] = [],
         ) {
             self.id = id
             self.actions = actions

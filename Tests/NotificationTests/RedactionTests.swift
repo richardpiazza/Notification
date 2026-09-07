@@ -21,7 +21,7 @@ final class RedactionTests: XCTestCase {
             keyPaths: [
                 "identities",
                 "values.pie",
-            ]
+            ],
         )
 
         XCTAssertEqual(
@@ -33,7 +33,7 @@ final class RedactionTests: XCTestCase {
                     "pie": .string("<REDACTED>"),
                     "pi": .stringConvertible(3.14),
                 ]),
-            ]
+            ],
         )
     }
 }

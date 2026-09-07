@@ -11,12 +11,12 @@ open class UserNotificationManager: AbstractNotificationManager {
     override public init(
         authorizationStatus: AuthorizationStatus = .notDetermined,
         categories: [UserNotification.Category] = [],
-        redactions: [String] = []
+        redactions: [String] = [],
     ) {
         super.init(
             authorizationStatus: authorizationStatus,
             categories: categories,
-            redactions: redactions
+            redactions: redactions,
         )
 
         userNotificationCenter.delegate = self

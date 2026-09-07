@@ -12,7 +12,7 @@ public extension UserNotification.Action {
             title: action.title,
             authenticationRequired: action.options.contains(.authenticationRequired),
             destructive: action.options.contains(.destructive),
-            foreground: action.options.contains(.foreground)
+            foreground: action.options.contains(.foreground),
         )
     }
 }
@@ -33,7 +33,7 @@ public extension UNNotificationAction {
         return UNNotificationAction(
             identifier: action.id,
             title: action.title,
-            options: options
+            options: options,
         )
     }
 }

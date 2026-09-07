@@ -22,7 +22,7 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
 
         public init(
             authorization: AuthorizationStatus? = nil,
-            authorizationBehavior: AuthorizationBehavior? = nil
+            authorizationBehavior: AuthorizationBehavior? = nil,
         ) {
             self.authorization = authorization
             self.authorizationBehavior = authorizationBehavior
@@ -33,7 +33,7 @@ open class EmulatedNotificationManager: AbstractNotificationManager {
 
     public init(
         authorization: AuthorizationStatus = .notDetermined,
-        authorizationBehavior: AuthorizationBehavior = .failure
+        authorizationBehavior: AuthorizationBehavior = .failure,
     ) {
         self.authorizationBehavior = authorizationBehavior
         super.init(authorizationStatus: authorization)

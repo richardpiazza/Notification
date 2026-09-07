@@ -39,7 +39,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     public init(
         authorizationStatus: AuthorizationStatus = .notDetermined,
         categories: [UserNotification.Category] = [],
-        redactions: [String] = []
+        redactions: [String] = [],
     ) {
         #if canImport(Combine)
         authorizationSubject = CurrentValueSubject(authorizationStatus)

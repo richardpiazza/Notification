@@ -9,7 +9,7 @@ public extension UserNotification {
         public init(
             id: String = UUID().uuidString,
             content: Content = Content(),
-            trigger: Trigger? = nil
+            trigger: Trigger? = nil,
         ) {
             self.id = id
             self.content = content

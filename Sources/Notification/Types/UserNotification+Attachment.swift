@@ -14,7 +14,7 @@ public extension UserNotification {
         public init(
             id: String = "",
             url: URL = URL(fileURLWithPath: ""),
-            type: String = ""
+            type: String = "",
         ) {
             self.id = id
             self.url = url
