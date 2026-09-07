@@ -36,11 +36,11 @@ open class UserNotificationManager: AbstractNotificationManager {
                 Logger.notification.error("Request Authorization Failure", metadata: ["localizedDescription": .string(e.localizedDescription)])
             } else if granted {
                 // One or more options were granted.
-                self?.authorizationSubject.send(.authorized)
+                self?.yieldAuthorizationStatus(.authorized)
                 Logger.notification.info("Notification Authorization Granted")
             } else {
                 // No options were granted.
-                self?.authorizationSubject.send(.denied)
+                self?.yieldAuthorizationStatus(.denied)
                 Logger.notification.warning("Notification Authorization Denied")
             }
         }

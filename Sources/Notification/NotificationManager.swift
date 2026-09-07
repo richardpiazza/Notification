@@ -1,7 +1,4 @@
 import Foundation
-#if canImport(Combine)
-import Combine
-#endif
 
 /// Manager that handles all interactions with push/local notifications.
 public protocol NotificationManager {
@@ -43,35 +40,18 @@ public protocol NotificationManager {
     func removePendingAndDeliveredNotifications(withId id: String)
     func removePendingAndDeliveredNotifications(withPrefix prefix: String)
 
+    /// AsyncStream which emits changes to the `AuthorizationStatus`.
     func authorizationStream() -> AsyncStream<AuthorizationStatus>
+
+    /// AsyncStream which emits changes to the APNS token.
     func apnsTokenStream() -> AsyncStream<Data?>
-    func trafficStream() -> AsyncStream<Traffic>
 
-    #if canImport(Combine)
-    /// Publisher that emits changes to the `AuthorizationStatus`.
-    @available(*, deprecated, renamed: "authorizationStream()")
-    var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { get }
-
-    /// Publisher that emits changes to the APNS token.
-    @available(*, deprecated, renamed: "apnsTokenStream()")
-    var apnsTokenPublisher: AnyPublisher<Data?, Never> { get }
-
-    /// Publisher that emits the content of all notifications received.
+    /// AsyncStream which emits the content of all notifications received.
     ///
     /// Content published here can be duplicated, as notifications are processed multiple times:
     /// * First when being presented (i.e. banner)
     /// * Second when a banner is interacted with (i.e. tapped)
-    @available(*, deprecated, renamed: "trafficStream()")
-    var trafficPublisher: AnyPublisher<Traffic, Never> { get }
-
-    /// Publisher that emits `PushNotification`s.
-    ///
-    /// This publisher emits under the following conditions:
-    /// * Notification is **silent**
-    /// * Notification is **interacted with in the foreground**.
-    @available(*, deprecated)
-    func remoteNotificationPublisher<T: RemoteNotification & Decodable>(decoder: JSONDecoder) -> AnyPublisher<T, Never>
-    #endif
+    func trafficStream() -> AsyncStream<Traffic>
 }
 
 public extension NotificationManager {
@@ -86,6 +66,11 @@ public extension NotificationManager {
         }
     }
 
+    /// AsyncStream which emits `RemoteNotification`s.
+    ///
+    /// This publisher emits under the following conditions:
+    /// * Notification is **silent**
+    /// * Notification is **interacted with in the foreground**.
     func remoteNotificationStream<T: RemoteNotification & Decodable>(decoder: JSONDecoder = JSONDecoder()) -> AsyncStream<T> {
         let stream = AsyncStream.makeStream(of: T.self)
 
@@ -122,52 +107,4 @@ public extension NotificationManager {
 
         return stream.stream
     }
-
-    #if canImport(Combine)
-    @available(*, deprecated)
-    func remoteNotificationPublisher<T: RemoteNotification & Decodable>(decoder: JSONDecoder = JSONDecoder()) -> AnyPublisher<T, Never> {
-        trafficPublisher
-            // `Payload` from '.silent' and '.interacted' only.
-            .compactMap { traffic in
-                #if os(tvOS)
-                switch traffic {
-                case .silent(let payload), .interacted(let payload):
-                    payload.userInfo
-                default:
-                    nil
-                }
-                #else
-                switch traffic {
-                case .silent(let payload), .interacted(let payload, _):
-                    payload.userInfo
-                default:
-                    nil
-                }
-                #endif
-            }
-            // Decode `UserInfo` to `T`
-            .flatMap { userInfo in
-                Just(userInfo)
-                    .tryMap {
-                        try JSONSerialization.data(withJSONObject: $0)
-                    }
-                    .decode(type: T.self, decoder: decoder)
-                    .tryMap {
-                        Result<T, Error>.success($0)
-                    }
-                    .catch { error in
-                        Just(Result<T, Error>.failure(error))
-                    }
-            }
-            // Exclude decoding failures & extract `T`.
-            .compactMap { result in
-                if case let .success(value) = result {
-                    value
-                } else {
-                    nil
-                }
-            }
-            .eraseToAnyPublisher()
-    }
-    #endif
 }
