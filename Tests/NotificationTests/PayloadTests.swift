@@ -1,9 +1,9 @@
 @testable import Notification
-import XCTest
+import Testing
 
-final class PayloadTests: XCTestCase {
+struct PayloadTests {
 
-    func testActionableNotificationUserInfo() throws {
+    @Test func actionableNotificationUserInfo() throws {
         let userInfo: UserInfo = [
             "aps": [
                 "alert": [
@@ -17,7 +17,7 @@ final class PayloadTests: XCTestCase {
 
         let payload = try UserNotification.Payload(userInfo: userInfo)
 
-        XCTAssertEqual(payload, [
+        #expect(payload == [
             "aps": .dictionary([
                 "alert": .dictionary([
                     "title": .string("Meeting Request"),
@@ -29,7 +29,7 @@ final class PayloadTests: XCTestCase {
         ])
     }
 
-    func testCustomDataNotificationUserInfo() throws {
+    @Test func customDataNotificationUserInfo() throws {
         let userInfo: UserInfo = [
             "aps": [
                 "alert": [
@@ -45,7 +45,7 @@ final class PayloadTests: XCTestCase {
 
         let payload = try UserNotification.Payload(userInfo: userInfo)
 
-        XCTAssertEqual(payload, [
+        #expect(payload == [
             "aps": .dictionary([
                 "alert": .dictionary([
                     "title": .string("New Document Shared"),

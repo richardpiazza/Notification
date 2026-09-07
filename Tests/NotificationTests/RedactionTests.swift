@@ -1,10 +1,10 @@
 import Logging
 @testable import Notification
-import XCTest
+import Testing
 
-final class RedactionTests: XCTestCase {
+struct RedactionTests {
 
-    func testRedactions() {
+    @Test func metadataRedactions() {
         let metadata: Logger.Metadata = [
             "agent": .string("Awesome"),
             "identities": .array([
@@ -24,16 +24,13 @@ final class RedactionTests: XCTestCase {
             ],
         )
 
-        XCTAssertEqual(
-            redacted,
-            [
-                "agent": .string("Awesome"),
-                "identities": .string("<REDACTED>"),
-                "values": .dictionary([
-                    "pie": .string("<REDACTED>"),
-                    "pi": .stringConvertible(3.14),
-                ]),
-            ],
-        )
+        #expect(redacted == [
+            "agent": .string("Awesome"),
+            "identities": .string("<REDACTED>"),
+            "values": .dictionary([
+                "pie": .string("<REDACTED>"),
+                "pi": .stringConvertible(3.14),
+            ]),
+        ])
     }
 }

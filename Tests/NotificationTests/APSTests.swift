@@ -1,11 +1,16 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 @testable import Notification
-import XCTest
+import Testing
 
-final class APSTests: XCTestCase {
+struct APSTests {
 
     let decoder = JSONDecoder()
 
-    func testAPSDecode() throws {
+    @Test func `Decode APS Payload`() throws {
         let json = """
         {
           "alert": {
@@ -15,16 +20,16 @@ final class APSTests: XCTestCase {
           "content-available": 1
         }
         """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+        let data = try #require(json.data(using: .utf8))
         let aps = try decoder.decode(APS.self, from: data)
-        XCTAssertEqual(aps.alert?.title, "Example Notification")
-        XCTAssertEqual(aps.alert?.body, "This is an example notification.")
-        XCTAssertEqual(aps.contentAvailable, 1)
+        #expect(aps.alert?.title == "Example Notification")
+        #expect(aps.alert?.body == "This is an example notification.")
+        #expect(aps.contentAvailable == 1)
     }
 
     /// Even though the APNS spec declares 'content-available' as an `Int`, many services
     /// return this an a `String`. Strict JSON parsing would normally fail.
-    func testAPSDecodeWithStringContentAvailable() throws {
+    @Test func `Decode APS Payload with Incorrect Data Type`() throws {
         let json = """
         {
           "alert": {
@@ -34,10 +39,10 @@ final class APSTests: XCTestCase {
           "content-available": "1"
         }
         """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+        let data = try #require(json.data(using: .utf8))
         let aps = try decoder.decode(APS.self, from: data)
-        XCTAssertEqual(aps.alert?.title, "Example Notification")
-        XCTAssertEqual(aps.alert?.body, "This is an example notification.")
-        XCTAssertEqual(aps.contentAvailable, 1)
+        #expect(aps.alert?.title == "Example Notification")
+        #expect(aps.alert?.body == "This is an example notification.")
+        #expect(aps.contentAvailable == 1)
     }
 }
