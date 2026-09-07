@@ -3,6 +3,7 @@ import Foundation
 import Logging
 import UserNotifications
 
+@available(*, deprecated, renamed: "UNUserNotificationManager")
 open class UserNotificationManager: AbstractNotificationManager {
 
     let userNotificationCenter: UNUserNotificationCenter = .current()
@@ -83,6 +84,7 @@ open class UserNotificationManager: AbstractNotificationManager {
 // MARK: - UNUserNotificationCenterDelegate
 
 /// NOTE: The async 'didReceive' method has an internal threading issue. Completion must be on main thread.
+@available(*, deprecated)
 extension UserNotificationManager: UNUserNotificationCenterDelegate {
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         // Consider yielding UserNotification.Content instead of Payload…
@@ -130,6 +132,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
 
 // MARK: - Private Implementation
 
+@available(*, deprecated)
 private extension UserNotificationManager {
     func getNotificationSettings() {
         userNotificationCenter.getNotificationSettings { [weak self] notificationSettings in

@@ -25,26 +25,28 @@ struct NotificationManagerTests {
         }
     }
 
-    private let notificationManager = EmulatedNotificationManager()
     private let aps1 = APS(alert: Alert(body: "Message 1"))
     private let aps2 = APS(alert: Alert(body: "Message 2"))
     private let aps3 = APS(alert: Alert(body: "Message 3"))
 
     @Test func remoteNotificationStream() async throws {
-        var contentReceived: Int = 0
-        var notificationsReceived: Int = 0
+        let notificationManager = EmulatedNotificationManager()
 
         let trafficTask = Task {
+            var received: Int = 0
             for await _ in notificationManager.trafficStream() {
-                contentReceived += 1
+                received += 1
             }
+            return received
         }
 
         let notificationTask = Task {
+            var received: Int = 0
             let stream: AsyncStream<APushNotification> = notificationManager.remoteNotificationStream()
             for await _ in stream {
-                notificationsReceived += 1
+                received += 1
             }
+            return received
         }
 
         var request = UserNotification.Request(
@@ -52,9 +54,7 @@ struct NotificationManagerTests {
                 payload: aps1.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
-
-        try await Task.sleep(for: .milliseconds(150))
+        try await notificationManager.localNotificationRequest(request)
 
         let aPush = APushNotification(aps: aps2, category: "Testing")
         request = UserNotification.Request(
@@ -62,27 +62,30 @@ struct NotificationManagerTests {
                 payload: aPush.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
-
-        try await Task.sleep(for: .milliseconds(150))
+        try await notificationManager.localNotificationRequest(request)
 
         request = UserNotification.Request(
             content: UserNotification.Content(
                 payload: aps3.payload,
             ),
         )
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
-        try await Task.sleep(for: .seconds(1.5))
-
-        #expect(contentReceived == 3)
-        #expect(notificationsReceived == 1)
+        try await Task.sleep(for: .seconds(1))
 
         trafficTask.cancel()
         notificationTask.cancel()
+
+        let contentReceived = await trafficTask.value
+        let notificationsReceived = await notificationTask.value
+
+        #expect(contentReceived == 3)
+        #expect(notificationsReceived == 1)
     }
 
     @Test func trafficStream() async throws {
+        let notificationManager = EmulatedNotificationManager()
+
         let subscription1 = Task {
             var output: [Traffic] = []
             for try await element in notificationManager.trafficStream() {
@@ -94,13 +97,13 @@ struct NotificationManagerTests {
         try await Task.sleep(for: .seconds(1))
 
         var request = UserNotification.Request(content: UserNotification.Content(payload: aps1.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         request = UserNotification.Request(content: UserNotification.Content(payload: aps2.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         request = UserNotification.Request(content: UserNotification.Content(payload: aps3.payload))
-        try notificationManager.localNotificationRequest(request)
+        try await notificationManager.localNotificationRequest(request)
 
         try await Task.sleep(for: .seconds(1))
 
