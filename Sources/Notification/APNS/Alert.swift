@@ -60,6 +60,35 @@ public struct Alert: Hashable, Sendable {
         self.actionLocalizationKey = actionLocalizationKey
         self.launchImage = launchImage
     }
+
+    public var payload: UserNotification.Payload {
+        var content = UserNotification.Payload()
+        if let title {
+            content[CodingKeys.title.rawValue] = .string(title)
+        }
+        if let body {
+            content[CodingKeys.body.rawValue] = .string(body)
+        }
+        if let titleLocalizationKey {
+            content[CodingKeys.titleLocalizationKey.rawValue] = .string(titleLocalizationKey)
+        }
+        if let titleLocalizationArguments {
+            content[CodingKeys.titleLocalizationArguments.rawValue] = .array(titleLocalizationArguments.map { UserNotification.PayloadValue.string($0) })
+        }
+        if let bodyLocalizationKey {
+            content[CodingKeys.bodyLocalizationKey.rawValue] = .string(bodyLocalizationKey)
+        }
+        if let bodyLocalizationArguments {
+            content[CodingKeys.bodyLocalizationArguments.rawValue] = .array(bodyLocalizationArguments.map { UserNotification.PayloadValue.string($0) })
+        }
+        if let actionLocalizationKey {
+            content[CodingKeys.actionLocalizationKey.rawValue] = .string(actionLocalizationKey)
+        }
+        if let launchImage {
+            content[CodingKeys.launchImage.rawValue] = .string(launchImage)
+        }
+        return content
+    }
 }
 
 extension Alert: Codable {

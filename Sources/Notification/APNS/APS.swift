@@ -56,6 +56,29 @@ public struct APS: Hashable, Sendable {
         let data = try JSONSerialization.data(withJSONObject: dictionary)
         self = try JSONDecoder().decode(Self.self, from: data)
     }
+
+    public var payload: UserNotification.Payload {
+        var content = UserNotification.Payload()
+        if let alert {
+            content[CodingKeys.alert.rawValue] = .dictionary(alert.payload)
+        }
+        if let badge {
+            content[CodingKeys.badge.rawValue] = .int(badge)
+        }
+        if let sound {
+            content[CodingKeys.sound.rawValue] = .string(sound)
+        }
+        if let contentAvailable {
+            content[CodingKeys.contentAvailable.rawValue] = .int(contentAvailable)
+        }
+        if let category {
+            content[CodingKeys.category.rawValue] = .string(category)
+        }
+        if let threadId {
+            content[CodingKeys.threadId.rawValue] = .string(threadId)
+        }
+        return content
+    }
 }
 
 extension APS: Codable {
@@ -91,11 +114,6 @@ extension APS: Codable {
 }
 
 public extension APS {
-    @available(*, deprecated, renamed: "userInfo")
-    var payload: Payload? {
-        userInfo
-    }
-
     var userInfo: UserInfo? {
         guard let data = try? JSONEncoder().encode(self) else {
             return nil

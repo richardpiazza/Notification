@@ -1,7 +1,7 @@
 @testable import Notification
-import XCTest
+import Testing
 
-final class NotificationManagerTests: XCTestCase {
+struct NotificationManagerTests {
 
     struct APushNotification: RemoteNotification, Decodable {
         var aps: APS
@@ -34,7 +34,7 @@ final class NotificationManagerTests: XCTestCase {
     private let aps2 = APS(alert: Alert(body: "Message 2"))
     private let aps3 = APS(alert: Alert(body: "Message 3"))
 
-    func testRemoteNotificationStream() async throws {
+    @Test func remoteNotificationStream() async throws {
         var contentReceived: Int = 0
         var notificationsReceived: Int = 0
 
@@ -67,14 +67,14 @@ final class NotificationManagerTests: XCTestCase {
 
         try await Task.sleep(for: .milliseconds(1500))
 
-        XCTAssertEqual(contentReceived, 3)
-        XCTAssertEqual(notificationsReceived, 1)
+        #expect(contentReceived == 3)
+        #expect(notificationsReceived == 1)
 
         trafficTask.cancel()
         notificationTask.cancel()
     }
 
-    func testTrafficStream() async throws {
+    @Test func trafficStream() async throws {
         let subscription1 = Task {
             var output: [Traffic] = []
             for try await element in notificationManager.trafficStream() {
@@ -104,6 +104,6 @@ final class NotificationManagerTests: XCTestCase {
 
         subscription1.cancel()
         let traffic = try await subscription1.value
-        XCTAssertEqual(traffic.count, 3)
+        #expect(traffic.count == 3)
     }
 }

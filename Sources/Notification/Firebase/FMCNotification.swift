@@ -1,25 +1,19 @@
 public protocol FCMNotification: RemoteNotification {
     var options: FCMOptions? { get }
+    var metadata: FCMMetadata? { get }
 }
 
 public extension FCMNotification {
-    @available(*, deprecated, renamed: "userInfo")
-    var payload: Payload {
-        userInfo
+    var payload: UserNotification.Payload {
+        var content = metadata?.payload ?? UserNotification.Payload()
+        content["aps"] = .dictionary(aps.payload)
+        if let options {
+            content["fcm_options"] = .dictionary(options.payload)
+        }
+        return content
     }
 
     var userInfo: UserInfo {
-        switch (aps.userInfo, options?.userInfo) {
-        case (.some(let apsPayload), .some(let optionsPayload)):
-            apsPayload.merging(optionsPayload) { _, rhs in
-                rhs
-            }
-        case (.some(let apsPayload), .none):
-            apsPayload
-        case (.none, .some(let optionsPayload)):
-            optionsPayload
-        default:
-            [:]
-        }
+        payload.userInfo
     }
 }
