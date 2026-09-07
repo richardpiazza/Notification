@@ -1,5 +1,3 @@
-import Foundation
-
 public extension UserNotification {
     struct Category: Hashable, Sendable, Identifiable, Codable {
 
@@ -7,7 +5,7 @@ public extension UserNotification {
         public let actions: [Action]
 
         public init(
-            id: String = UUID().uuidString,
+            id: String = "",
             actions: [Action] = [],
         ) {
             self.id = id

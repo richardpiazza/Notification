@@ -1,13 +1,11 @@
-import Foundation
-
 public extension UserNotification {
-    struct Request: Identifiable {
+    struct Request: Hashable, Sendable, Identifiable {
         public let id: String
         public let content: Content
         public let trigger: Trigger?
 
         public init(
-            id: String = UUID().uuidString,
+            id: String = "",
             content: Content = Content(),
             trigger: Trigger? = nil,
         ) {

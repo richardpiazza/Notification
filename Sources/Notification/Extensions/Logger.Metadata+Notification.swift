@@ -1,6 +1,11 @@
 import Logging
 
 extension Logger.Metadata {
+    /// Recurses through the instance and redacts any values associated to the specified paths.
+    ///
+    /// - parameters:
+    ///   - keyPaths: Collection of _dotted_ paths that should have their values redacted.
+    ///   - redaction: The value to put in place of those that are identified.
     func redacting(keyPaths: [String] = [], with redaction: String = "<REDACTED>") -> Self {
         var dictionary = self
 

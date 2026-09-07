@@ -1,5 +1,3 @@
-import Foundation
-
 /// A `RemoteNotification` delivered through Google/Firebase Cloud Messaging.
 public struct FirebaseCloudMessage: FCMNotification, Hashable, Sendable {
     public let aps: APS

@@ -76,7 +76,7 @@ public extension NotificationManager {
 
         let task = Task {
             for await value in trafficStream() {
-                var notificationPayload: UserNotification.Payload
+                var notificationPayload: Payload
                 #if os(tvOS)
                 switch value {
                 case .silent(let payload), .interacted(let payload):

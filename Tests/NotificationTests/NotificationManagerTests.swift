@@ -12,20 +12,15 @@ struct NotificationManagerTests {
             self.category = category
         }
 
-        var userInfo: UserInfo {
-            var content = UserInfo()
-
-            if let notificationContent = aps.userInfo {
-                content.merge(notificationContent) { _, overwrite in
-                    overwrite
-                }
-            }
-
-            content.merge([CodingKeys.category.stringValue: category]) { _, overwrite in
-                overwrite
-            }
-
+        var payload: Payload {
+            var content = Payload()
+            content["aps"] = .dictionary(aps.payload)
+            content["category"] = .string(category)
             return content
+        }
+
+        var userInfo: UserInfo {
+            payload
         }
     }
 
@@ -51,21 +46,33 @@ struct NotificationManagerTests {
             }
         }
 
-        if let content = aps1.userInfo {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
-            try notificationManager.localNotificationRequest(request)
-        }
+        var request = UserNotification.Request(
+            content: UserNotification.Content(
+                payload: aps1.payload,
+            ),
+        )
+        try notificationManager.localNotificationRequest(request)
+
+        try await Task.sleep(for: .milliseconds(150))
 
         let aPush = APushNotification(aps: aps2, category: "Testing")
-        let request2 = UserNotification.Request(content: UserNotification.Content(userInfo: aPush.userInfo))
-        try notificationManager.localNotificationRequest(request2)
+        request = UserNotification.Request(
+            content: UserNotification.Content(
+                payload: aPush.payload,
+            ),
+        )
+        try notificationManager.localNotificationRequest(request)
 
-        if let content = aps3.userInfo {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
-            try notificationManager.localNotificationRequest(request)
-        }
+        try await Task.sleep(for: .milliseconds(150))
 
-        try await Task.sleep(for: .milliseconds(1500))
+        request = UserNotification.Request(
+            content: UserNotification.Content(
+                payload: aps3.payload,
+            ),
+        )
+        try notificationManager.localNotificationRequest(request)
+
+        try await Task.sleep(for: .milliseconds(150))
 
         #expect(contentReceived == 3)
         #expect(notificationsReceived == 1)
@@ -85,20 +92,14 @@ struct NotificationManagerTests {
 
         try await Task.sleep(nanoseconds: 100_000_000)
 
-        if let payload = aps1.userInfo {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
-            try notificationManager.localNotificationRequest(request)
-        }
+        var request = UserNotification.Request(content: UserNotification.Content(payload: aps1.payload))
+        try notificationManager.localNotificationRequest(request)
 
-        if let payload = aps2.userInfo {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
-            try notificationManager.localNotificationRequest(request)
-        }
+        request = UserNotification.Request(content: UserNotification.Content(payload: aps2.payload))
+        try notificationManager.localNotificationRequest(request)
 
-        if let payload = aps3.userInfo {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: payload))
-            try notificationManager.localNotificationRequest(request)
-        }
+        request = UserNotification.Request(content: UserNotification.Content(payload: aps3.payload))
+        try notificationManager.localNotificationRequest(request)
 
         try await Task.sleep(nanoseconds: 100_000_000)
 

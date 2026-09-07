@@ -1,5 +1,5 @@
 public extension UserNotification {
-    struct Content {
+    struct Content: Hashable, Sendable {
         /// Optional array of attachments.
         public let attachments: [Attachment]
         /// The application badge number.
@@ -23,7 +23,7 @@ public extension UserNotification {
         /// Apps can set the userInfo for locally scheduled notification requests.
         ///
         /// The contents of the push payload will be set as the userInfo for remote notifications.
-        public let userInfo: UserInfo
+        public let payload: Notification.Payload
 
         public init(
             attachments: [UserNotification.Attachment] = [],
@@ -35,7 +35,7 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            userInfo: UserInfo = UserInfo(),
+            payload: Notification.Payload = Notification.Payload(),
         ) {
             self.attachments = attachments
             self.badge = badge
@@ -46,10 +46,10 @@ public extension UserNotification {
             self.subtitle = subtitle
             self.threadIdentifier = threadIdentifier
             self.title = title
-            self.userInfo = userInfo
+            self.payload = payload
         }
 
-        @available(*, deprecated, renamed: "init(attachments:badge:body:categoryId:launchImageName:sound:subtitle:threadIdentifier:title:userInfo:)")
+        @available(*, deprecated, renamed: "init(attachments:badge:body:categoryId:launchImageName:sound:subtitle:threadIdentifier:title:payload:)")
         public init(
             attachments: [UserNotification.Attachment] = [],
             badge: Int? = nil,
@@ -60,8 +60,8 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            payload: Notification.Payload,
-        ) {
+            userInfo: UserInfo,
+        ) throws {
             self.attachments = attachments
             self.badge = badge
             self.body = body
@@ -71,21 +71,24 @@ public extension UserNotification {
             self.subtitle = subtitle
             self.threadIdentifier = threadIdentifier
             self.title = title
-            userInfo = payload
+            payload = try Notification.Payload(userInfo: userInfo)
+        }
+    }
+}
+
+public extension UserNotification.Content {
+    @available(*, deprecated, renamed: "payload")
+    var userInfo: UserInfo {
+        payload.userInfo
+    }
+
+    @available(*, deprecated)
+    var aps: APS? {
+        guard let dictionary = userInfo["aps"] as? [String: Any] else {
+            return nil
         }
 
-        @available(*, deprecated, renamed: "userInfo")
-        public var payload: Notification.Payload {
-            userInfo
-        }
-
-        public var aps: APS? {
-            guard let dictionary = userInfo["aps"] as? [String: Any] else {
-                return nil
-            }
-
-            return try? APS(dictionary: dictionary)
-        }
+        return try? APS(dictionary: dictionary)
     }
 }
 
@@ -104,7 +107,7 @@ extension UserNotification.Content: CustomDebugStringConvertible {
           subtitle: \(subtitle)
           threadIdentifier: \(threadIdentifier)
           title: \(title)
-          userInfo: \(userInfo.debugDescription)
+          payload: \(payload.debugDescription)
         }
         """
     }

@@ -52,33 +52,14 @@ public struct APS: Hashable, Sendable {
         self.threadId = threadId
     }
 
+    @available(*, deprecated)
     public init(dictionary: [String: Any]) throws {
         let data = try JSONSerialization.data(withJSONObject: dictionary)
         self = try JSONDecoder().decode(Self.self, from: data)
     }
 
-    public var payload: UserNotification.Payload {
-        var content = UserNotification.Payload()
-        if let alert {
-            content[CodingKeys.alert.rawValue] = .dictionary(alert.payload)
-        }
-        if let badge {
-            content[CodingKeys.badge.rawValue] = .int(badge)
-        }
-        if let sound {
-            content[CodingKeys.sound.rawValue] = .string(sound)
-        }
-        if let contentAvailable {
-            content[CodingKeys.contentAvailable.rawValue] = .int(contentAvailable)
-        }
-        if let category {
-            content[CodingKeys.category.rawValue] = .string(category)
-        }
-        if let threadId {
-            content[CodingKeys.threadId.rawValue] = .string(threadId)
-        }
-        return content
-    }
+    /// Indicates if the `contentAvailable` flag has been set in the affirmative.
+    public var isSilent: Bool { contentAvailable == 1 }
 }
 
 extension APS: Codable {
@@ -113,7 +94,97 @@ extension APS: Codable {
     }
 }
 
+extension APS: ExpressibleByPayload {
+    public init(payload: Payload) throws {
+        if payload.contains(where: { $0.key == CodingKeys.alert.rawValue }) {
+            guard case .dictionary(let aps) = payload[CodingKeys.alert.rawValue] else {
+                throw DecodingError.typeMismatch(Alert.self, DecodingError.Context(codingPath: [CodingKeys.alert], debugDescription: ""))
+            }
+
+            alert = try Alert(payload: aps)
+        } else {
+            alert = nil
+        }
+
+        if payload.contains(where: { $0.key == CodingKeys.badge.rawValue }) {
+            guard case .int(let badge) = payload[CodingKeys.badge.rawValue] else {
+                throw DecodingError.typeMismatch(Int.self, DecodingError.Context(codingPath: [CodingKeys.badge], debugDescription: ""))
+            }
+
+            self.badge = badge
+        } else {
+            badge = nil
+        }
+
+        if payload.contains(where: { $0.key == CodingKeys.sound.rawValue }) {
+            guard case .string(let sound) = payload[CodingKeys.sound.rawValue] else {
+                throw DecodingError.typeMismatch(Int.self, DecodingError.Context(codingPath: [CodingKeys.sound], debugDescription: ""))
+            }
+
+            self.sound = sound
+        } else {
+            sound = nil
+        }
+
+        if payload.contains(where: { $0.key == CodingKeys.contentAvailable.rawValue }) {
+            guard case .int(let contentAvailable) = payload[CodingKeys.contentAvailable.rawValue] else {
+                throw DecodingError.typeMismatch(Int.self, DecodingError.Context(codingPath: [CodingKeys.contentAvailable], debugDescription: ""))
+            }
+
+            self.contentAvailable = contentAvailable
+        } else {
+            contentAvailable = nil
+        }
+
+        if payload.contains(where: { $0.key == CodingKeys.category.rawValue }) {
+            guard case .string(let category) = payload[CodingKeys.category.rawValue] else {
+                throw DecodingError.typeMismatch(String.self, DecodingError.Context(codingPath: [CodingKeys.category], debugDescription: ""))
+            }
+
+            self.category = category
+        } else {
+            category = nil
+        }
+
+        if payload.contains(where: { $0.key == CodingKeys.threadId.rawValue }) {
+            guard case .string(let threadId) = payload[CodingKeys.threadId.rawValue] else {
+                throw DecodingError.typeMismatch(String.self, DecodingError.Context(codingPath: [CodingKeys.threadId], debugDescription: ""))
+            }
+
+            self.threadId = threadId
+        } else {
+            threadId = nil
+        }
+    }
+}
+
+extension APS: PayloadConvertible {
+    public var payload: Payload {
+        var content = Payload()
+        if let alert {
+            content[CodingKeys.alert.rawValue] = .dictionary(alert.payload)
+        }
+        if let badge {
+            content[CodingKeys.badge.rawValue] = .int(badge)
+        }
+        if let sound {
+            content[CodingKeys.sound.rawValue] = .string(sound)
+        }
+        if let contentAvailable {
+            content[CodingKeys.contentAvailable.rawValue] = .int(contentAvailable)
+        }
+        if let category {
+            content[CodingKeys.category.rawValue] = .string(category)
+        }
+        if let threadId {
+            content[CodingKeys.threadId.rawValue] = .string(threadId)
+        }
+        return content
+    }
+}
+
 public extension APS {
+    @available(*, deprecated, renamed: "payload")
     var userInfo: UserInfo? {
         guard let data = try? JSONEncoder().encode(self) else {
             return nil
@@ -124,23 +195,5 @@ public extension APS {
         }
 
         return ["aps": dictionary]
-    }
-
-    /// Indicates if the `contentAvailable` flag has been set in the affirmative.
-    var isSilent: Bool { contentAvailable == 1 }
-}
-
-public extension UserInfo {
-    @available(*, deprecated)
-    var aps: APS? {
-        guard let dictionary = self["aps"] else {
-            return nil
-        }
-
-        guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
-            return nil
-        }
-
-        return try? JSONDecoder().decode(APS.self, from: data)
     }
 }

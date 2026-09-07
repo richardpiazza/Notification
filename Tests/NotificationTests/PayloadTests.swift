@@ -15,7 +15,7 @@ struct PayloadTests {
             "meeting_id": "mtg_404",
         ]
 
-        let payload = try UserNotification.Payload(userInfo: userInfo)
+        let payload = try Payload(userInfo: userInfo)
 
         #expect(payload == [
             "aps": .dictionary([
@@ -43,7 +43,7 @@ struct PayloadTests {
             "shared_by_user_id": "usr_123",
         ]
 
-        let payload = try UserNotification.Payload(userInfo: userInfo)
+        let payload = try Payload(userInfo: userInfo)
 
         #expect(payload == [
             "aps": .dictionary([

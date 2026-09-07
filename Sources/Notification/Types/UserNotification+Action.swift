@@ -1,5 +1,3 @@
-import Foundation
-
 public extension UserNotification {
     struct Action: Hashable, Sendable, Identifiable, Codable {
         /// The unique identifier for this action.
@@ -14,7 +12,7 @@ public extension UserNotification {
         public let foreground: Bool
 
         public init(
-            id: String = UUID().uuidString,
+            id: String = "",
             title: String = "",
             authenticationRequired: Bool = false,
             destructive: Bool = false,
