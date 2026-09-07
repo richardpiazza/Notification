@@ -74,7 +74,7 @@ public final class UNUserNotificationManager: NSObject, NotificationManager, Sen
             }
         } catch {
             logger.warning("Request Authorization Failed", metadata: [
-                NSLocalizedDescriptionKey: .string(error.localizedDescription),
+                "NSLocalizedDescription": .string(error.localizedDescription),
             ])
         }
     }
@@ -92,7 +92,7 @@ public final class UNUserNotificationManager: NSObject, NotificationManager, Sen
 
     public func didFailToRegisterForRemoteNotificationsWithError(_ error: any Error) {
         logger.error("Remote Notification Registration Failed", metadata: [
-            NSLocalizedDescriptionKey: .string(error.localizedDescription),
+            "NSLocalizedDescription": .string(error.localizedDescription),
         ])
     }
 
@@ -128,11 +128,13 @@ public final class UNUserNotificationManager: NSObject, NotificationManager, Sen
             .map(\.identifier)
         notificationCenter.removePendingNotificationRequests(withIdentifiers: ids)
 
+        #if !os(tvOS)
         let delivered = await notificationCenter.deliveredNotifications()
         ids = delivered
             .filter { $0.request.identifier.hasPrefix(prefix) }
             .map(\.request.identifier)
         notificationCenter.removePendingNotificationRequests(withIdentifiers: ids)
+        #endif
     }
 
     public func authorizationStream() -> AsyncStream<AuthorizationStatus> {
@@ -152,8 +154,7 @@ extension UNUserNotificationManager: UNUserNotificationCenterDelegate {
     @MainActor public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         #if os(tvOS)
         return []
-        #endif
-
+        #else
         guard let payload = try? Payload(userInfo: notification.request.content.userInfo) else {
             return []
         }
@@ -167,8 +168,10 @@ extension UNUserNotificationManager: UNUserNotificationCenterDelegate {
         trafficPassthroughValueSubject.yield(.presented(payload))
 
         return [.list, .banner, .badge, .sound]
+        #endif
     }
 
+    #if !os(tvOS)
     @MainActor public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         guard let payload = try? Payload(userInfo: response.notification.request.content.userInfo) else {
             return
@@ -196,5 +199,6 @@ extension UNUserNotificationManager: UNUserNotificationCenterDelegate {
 
         trafficPassthroughValueSubject.yield(.interacted(payload, action))
     }
+    #endif
 }
 #endif

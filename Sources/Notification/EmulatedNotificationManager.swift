@@ -85,7 +85,7 @@ public final class EmulatedNotificationManager: NotificationManager, Sendable {
 
     public func didFailToRegisterForRemoteNotificationsWithError(_ error: any Error) {
         logger.error("Remote Notification Registration Failed", metadata: [
-            NSLocalizedDescriptionKey: .string(error.localizedDescription),
+            "NSLocalizedDescription": .string(error.localizedDescription),
         ])
     }
 
