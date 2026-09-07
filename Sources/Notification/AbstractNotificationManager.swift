@@ -1,23 +1,9 @@
 import AsyncPlus
-#if canImport(Combine)
-import Combine
-#endif
 import Foundation
 import Logging
 
-/// Notification manager that is pre-configured with support for Combine Publishers and Async Streams.
+/// A pre-configured Notification Manager.
 open class AbstractNotificationManager: NSObject, NotificationManager {
-
-    #if canImport(Combine)
-    public let authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never>
-    public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
-
-    public let apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
-    public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
-
-    public let trafficSubject: PassthroughSubject<Traffic, Never> = PassthroughSubject()
-    public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
-    #endif
 
     private let authorizationCurrentValueSubject: CurrentValueAsyncSubject<AuthorizationStatus>
     private let pushTokenCurrentValueSubject: CurrentValueAsyncSubject<Data?> = CurrentValueAsyncSubject(nil)
@@ -41,9 +27,6 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
         categories: [UserNotification.Category] = [],
         redactions: [String] = [],
     ) {
-        #if canImport(Combine)
-        authorizationSubject = CurrentValueSubject(authorizationStatus)
-        #endif
         authorizationCurrentValueSubject = CurrentValueAsyncSubject(authorizationStatus)
         self.categories = categories
         self.redactions = redactions
@@ -108,23 +91,14 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
 
 public extension AbstractNotificationManager {
     final func yieldAuthorizationStatus(_ authorizationStatus: AuthorizationStatus) {
-        #if canImport(Combine)
-        authorizationSubject.send(authorizationStatus)
-        #endif
         authorizationCurrentValueSubject.yield(authorizationStatus)
     }
 
     final func yieldAPNSTokenData(_ token: Data) {
-        #if canImport(Combine)
-        apnsTokenSubject.send(token)
-        #endif
         pushTokenCurrentValueSubject.yield(token)
     }
 
     final func yieldTraffic(_ traffic: Traffic) {
-        #if canImport(Combine)
-        trafficSubject.send(traffic)
-        #endif
         trafficPassthroughValueSubject.yield(traffic)
     }
 }

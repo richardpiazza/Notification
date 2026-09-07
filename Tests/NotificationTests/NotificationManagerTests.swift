@@ -1,8 +1,5 @@
-import XCTest
-#if canImport(Combine)
-import Combine
-#endif
 @testable import Notification
+import XCTest
 
 final class NotificationManagerTests: XCTestCase {
 
@@ -36,47 +33,6 @@ final class NotificationManagerTests: XCTestCase {
     private let aps1 = APS(alert: Alert(body: "Message 1"))
     private let aps2 = APS(alert: Alert(body: "Message 2"))
     private let aps3 = APS(alert: Alert(body: "Message 3"))
-
-    #if canImport(Combine)
-    private var cancelStore: [AnyCancellable] = []
-
-    @available(*, deprecated)
-    func testPushNotificationPublisher() throws {
-        var contentReceived: Int = 0
-        var notificationsReceived: Int = 0
-
-        notificationManager.trafficPublisher
-            .sink { _ in
-                contentReceived += 1
-            }
-            .store(in: &cancelStore)
-
-        notificationManager.remoteNotificationPublisher()
-            .sink { (_: APushNotification) in
-                notificationsReceived += 1
-            }
-            .store(in: &cancelStore)
-
-        if let content = aps1.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
-            try notificationManager.localNotificationRequest(request)
-        }
-
-        let aPush = APushNotification(aps: aps2, category: "Testing")
-        let request2 = UserNotification.Request(content: UserNotification.Content(userInfo: aPush.payload))
-        try notificationManager.localNotificationRequest(request2)
-
-        if let content = aps3.payload {
-            let request = UserNotification.Request(content: UserNotification.Content(userInfo: content))
-            try notificationManager.localNotificationRequest(request)
-        }
-
-        _ = DispatchSemaphore(value: 0).wait(timeout: .now() + 2.0)
-
-        XCTAssertEqual(contentReceived, 3)
-        XCTAssertEqual(notificationsReceived, 1)
-    }
-    #endif
 
     func testRemoteNotificationStream() async throws {
         var contentReceived: Int = 0
