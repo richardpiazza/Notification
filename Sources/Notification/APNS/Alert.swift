@@ -49,7 +49,7 @@ public struct Alert: Hashable, Sendable {
         bodyLocalizationKey: String? = nil,
         bodyLocalizationArguments: [String]? = nil,
         actionLocalizationKey: String? = nil,
-        launchImage: String? = nil
+        launchImage: String? = nil,
     ) {
         self.title = title
         self.body = body

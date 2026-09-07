@@ -42,7 +42,7 @@ public extension UserNotification {
             default:
                 let context = DecodingError.Context(
                     codingPath: [],
-                    debugDescription: "Unhandled Type"
+                    debugDescription: "Unhandled Type",
                 )
                 throw DecodingError.typeMismatch(type(of: any), context)
             }
@@ -81,7 +81,7 @@ public extension UserNotification.Payload {
         guard let dictionary = userInfo as? [String: Any] else {
             let context = DecodingError.Context(
                 codingPath: [],
-                debugDescription: ""
+                debugDescription: "",
             )
             throw DecodingError.dataCorrupted(context)
         }

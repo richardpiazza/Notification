@@ -42,7 +42,7 @@ public struct APS: Hashable, Sendable {
         sound: String? = nil,
         contentAvailable: Int? = nil,
         category: String? = nil,
-        threadId: String? = nil
+        threadId: String? = nil,
     ) {
         self.alert = alert
         self.badge = badge

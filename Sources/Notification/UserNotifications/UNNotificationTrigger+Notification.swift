@@ -7,22 +7,22 @@ public extension UserNotification.Trigger {
         case is UNPushNotificationTrigger:
             UserNotification.Trigger(
                 event: .push,
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         case let interval as UNTimeIntervalNotificationTrigger:
             UserNotification.Trigger(
                 event: .timeInterval(interval.timeInterval),
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         case let calendar as UNCalendarNotificationTrigger:
             UserNotification.Trigger(
                 event: .calendar(calendar.dateComponents),
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         default:
             UserNotification.Trigger(
                 event: nil,
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         }
     }
@@ -34,12 +34,12 @@ public extension UNNotificationTrigger {
         case .timeInterval(let timeInterval):
             return UNTimeIntervalNotificationTrigger(
                 timeInterval: timeInterval,
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         case .calendar(let dateComponents):
             return UNCalendarNotificationTrigger(
                 dateMatching: dateComponents,
-                repeats: trigger.repeats
+                repeats: trigger.repeats,
             )
         default:
             throw CocoaError(.featureUnsupported)

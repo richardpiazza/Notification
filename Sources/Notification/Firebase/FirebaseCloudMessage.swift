@@ -14,7 +14,7 @@ open class FirebaseCloudMessage: RemoteNotification, Codable {
 
     public init(
         aps: APS = APS(),
-        options: FCMOptions? = nil
+        options: FCMOptions? = nil,
     ) {
         self.aps = aps
         self.options = options

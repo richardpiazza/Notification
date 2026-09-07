@@ -67,7 +67,7 @@ public extension JSONSerialization {
     static func json(
         withJSONObject object: Any,
         options: JSONSerialization.WritingOptions = [.prettyPrinted, .sortedKeys],
-        redacting keyPaths: [String] = []
+        redacting keyPaths: [String] = [],
     ) throws -> String {
         let redactedObject = redact(object, keyPathsToRedact: keyPaths)
         let data = try JSONSerialization.data(withJSONObject: redactedObject, options: options)

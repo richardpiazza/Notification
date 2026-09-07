@@ -6,7 +6,7 @@ public extension UserNotification.Attachment {
         UserNotification.Attachment(
             id: attachment.identifier,
             url: attachment.url,
-            type: attachment.type
+            type: attachment.type,
         )
     }
 }
@@ -16,7 +16,7 @@ public extension UNNotificationAttachment {
         try UNNotificationAttachment(
             identifier: attachment.id,
             url: attachment.url,
-            options: nil
+            options: nil,
         )
     }
 }

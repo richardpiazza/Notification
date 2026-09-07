@@ -6,7 +6,7 @@ public struct UserNotification {
 
     public init(
         date: Date = Date(),
-        request: Request = Request()
+        request: Request = Request(),
     ) {
         self.date = date
         self.request = request

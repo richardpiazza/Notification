@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -11,6 +11,7 @@ let package = Package(
         .iOS(.v16),
         .tvOS(.v16),
         .watchOS(.v9),
+        .visionOS(.v1),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -18,7 +19,7 @@ let package = Package(
             name: "Notification",
             targets: [
                 "Notification",
-            ]
+            ],
         ),
     ],
     dependencies: [
@@ -37,7 +38,7 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "AsyncPlus", package: "AsyncPlus"),
                 .product(name: "Harness", package: "Harness"),
-            ]
+            ],
         ),
         .testTarget(
             name: "NotificationTests",
@@ -46,7 +47,8 @@ let package = Package(
             ],
             resources: [
                 .process("Resources"),
-            ]
+            ],
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v5],
 )

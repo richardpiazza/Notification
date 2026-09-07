@@ -18,7 +18,7 @@ public extension UserNotification {
             title: String = "",
             authenticationRequired: Bool = false,
             destructive: Bool = false,
-            foreground: Bool = false
+            foreground: Bool = false,
         ) {
             self.id = id
             self.title = title

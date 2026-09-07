@@ -6,7 +6,7 @@ public extension UserNotification.Request {
         UserNotification.Request(
             id: request.identifier,
             content: UserNotification.Content.make(with: request.content),
-            trigger: request.trigger.map { UserNotification.Trigger.make(with: $0) }
+            trigger: request.trigger.map { UserNotification.Trigger.make(with: $0) },
         )
     }
 }
@@ -21,7 +21,7 @@ public extension UNNotificationRequest {
         return UNNotificationRequest(
             identifier: request.id,
             content: UNNotificationContent.make(with: request.content),
-            trigger: trigger
+            trigger: trigger,
         )
     }
 }

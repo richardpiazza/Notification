@@ -14,7 +14,7 @@ public extension UserNotification {
 
         public init(
             event: Event? = nil,
-            repeats: Bool = false
+            repeats: Bool = false,
         ) {
             self.event = event
             self.repeats = repeats

@@ -35,7 +35,7 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            userInfo: UserInfo = UserInfo()
+            userInfo: UserInfo = UserInfo(),
         ) {
             self.attachments = attachments
             self.badge = badge
@@ -60,7 +60,7 @@ public extension UserNotification {
             subtitle: String = "",
             threadIdentifier: String = "",
             title: String = "",
-            payload: Notification.Payload
+            payload: Notification.Payload,
         ) {
             self.attachments = attachments
             self.badge = badge

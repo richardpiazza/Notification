@@ -13,7 +13,7 @@ public extension UserNotification.Content {
         return UserNotification.Content(
             badge: notificationContent.badge?.intValue,
             launchImageName: launchImageName,
-            sound: nil
+            sound: nil,
         )
         #else
         return UserNotification.Content(
@@ -26,7 +26,7 @@ public extension UserNotification.Content {
             subtitle: notificationContent.subtitle,
             threadIdentifier: notificationContent.threadIdentifier,
             title: notificationContent.title,
-            userInfo: notificationContent.userInfo
+            userInfo: notificationContent.userInfo,
         )
         #endif
     }
