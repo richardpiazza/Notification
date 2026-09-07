@@ -1,3 +1,5 @@
+import Logging
+
 public extension UserNotification {
     struct Category: Hashable, Sendable, Identifiable, Codable {
 
@@ -11,18 +13,12 @@ public extension UserNotification {
             self.id = id
             self.actions = actions
         }
-    }
-}
 
-extension UserNotification.Category: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Category {
-          id: \(id)
-          actions: [
-            \(actions.map(\.debugDescription))
-          ]
+        public var metadata: Logger.Metadata {
+            [
+                "id": .string(id),
+                "actions": .array(actions.map { .dictionary($0.metadata) }),
+            ]
         }
-        """
     }
 }

@@ -3,6 +3,7 @@ import FoundationEssentials
 #else
 import Foundation
 #endif
+import Logging
 
 public extension UserNotification {
     struct Trigger: Hashable, Sendable {
@@ -11,6 +12,17 @@ public extension UserNotification {
             case push
             case timeInterval(TimeInterval)
             case calendar(DateComponents)
+
+            public var metadataValue: Logger.MetadataValue {
+                switch self {
+                case .push:
+                    .string("push")
+                case .timeInterval(let timeInterval):
+                    .dictionary(["interval": .stringConvertible(timeInterval)])
+                case .calendar(let dateComponents):
+                    .dictionary(["calendar": dateComponents.metadataValue])
+                }
+            }
         }
 
         public let event: Event?
@@ -23,29 +35,14 @@ public extension UserNotification {
             self.event = event
             self.repeats = repeats
         }
-    }
-}
 
-extension UserNotification.Trigger: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Trigger {
-          event: \(event?.debugDescription ?? "NIL")
-          repeats: \(repeats ? "YES" : "NO")
-        }
-        """
-    }
-}
-
-extension UserNotification.Trigger.Event: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        switch self {
-        case .push:
-            "UserNotification.Trigger.Event { Push }"
-        case .timeInterval(let timeInterval):
-            "UserNotification.Trigger.Event { Time Interval - \(timeInterval) }"
-        case .calendar(let dateComponents):
-            "UserNotification.Trigger.Event { Date Components - \(dateComponents) }"
+        public var metadata: Logger.Metadata {
+            var content = Logger.Metadata()
+            if let event {
+                content["event"] = event.metadataValue
+            }
+            content["repeats"] = .stringConvertible(repeats)
+            return content
         }
     }
 }

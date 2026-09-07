@@ -1,3 +1,5 @@
+import Logging
+
 public extension UserNotification {
     enum Sound: Hashable, Sendable {
         /// Default alerts
@@ -41,17 +43,35 @@ public extension UserNotification {
                 nil
             }
         }
-    }
-}
 
-extension UserNotification.Sound: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Sound {
-          name: \(name ?? "NIL")
-          isDefault: \(isDefault ? "YES" : "NO")
-          isCritical: \(isCritical ? "YES" : "NO")
+        public var metadataValue: Logger.MetadataValue {
+            switch self {
+            case .default:
+                .string("default")
+            case .named(let string):
+                .dictionary(["named": .string(string)])
+            case .critical(let name, let volume):
+                switch (name, volume) {
+                case (.some(let criticalName), .some(let criticalVolume)):
+                    .dictionary([
+                        "name": .string(criticalName),
+                        "volume": .stringConvertible(criticalVolume),
+                    ])
+                case (.some(let criticalName), .none):
+                    .dictionary([
+                        "name": .string(criticalName),
+                    ])
+                case (.none, .some(let criticalVolume)):
+                    .dictionary([
+                        "name": .string("critical"),
+                        "volume": .stringConvertible(criticalVolume),
+                    ])
+                case (.none, .none):
+                    .dictionary([
+                        "name": .string("critical"),
+                    ])
+                }
+            }
         }
-        """
     }
 }

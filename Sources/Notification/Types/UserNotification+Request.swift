@@ -1,3 +1,5 @@
+import Logging
+
 public extension UserNotification {
     struct Request: Hashable, Sendable, Identifiable {
         public let id: String
@@ -13,17 +15,16 @@ public extension UserNotification {
             self.content = content
             self.trigger = trigger
         }
-    }
-}
 
-extension UserNotification.Request: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Request {
-          id: \(id)
-          content: \(content.debugDescription)
-          trigger: \(trigger?.debugDescription ?? "NIL")
+        public var metadata: Logger.Metadata {
+            var output: Logger.Metadata = [
+                "id": .string(id),
+                "content": .dictionary(content.payload.metadata),
+            ]
+            if let trigger {
+                output["trigger"] = .dictionary(trigger.metadata)
+            }
+            return output
         }
-        """
     }
 }

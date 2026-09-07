@@ -16,14 +16,3 @@ public struct UserNotification: Hashable, Sendable {
         self.request = request
     }
 }
-
-extension UserNotification: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification {
-          date: \(date.debugDescription)
-          request: \(request.debugDescription)
-        }
-        """
-    }
-}

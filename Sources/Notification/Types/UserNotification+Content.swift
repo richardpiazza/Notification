@@ -1,3 +1,5 @@
+import Logging
+
 public extension UserNotification {
     struct Content: Hashable, Sendable {
         /// Optional array of attachments.
@@ -73,6 +75,26 @@ public extension UserNotification {
             self.title = title
             payload = try Notification.Payload(userInfo: userInfo)
         }
+
+        public var metadata: Logger.Metadata {
+            var content: Logger.Metadata = [
+                "attachments": .array(attachments.map { .dictionary($0.metadata) }),
+                "body": .string(body),
+                "categoryId": .string(categoryId),
+                "launchImageName": .string(launchImageName),
+                "subtitle": .string(subtitle),
+                "threadIdentifier": .string(threadIdentifier),
+                "title": .string(title),
+                "payload": .dictionary(payload.metadata),
+            ]
+            if let badge {
+                content["badge"] = .stringConvertible(badge)
+            }
+            if let sound {
+                content["sound"] = sound.metadataValue
+            }
+            return content
+        }
     }
 }
 
@@ -89,26 +111,5 @@ public extension UserNotification.Content {
         }
 
         return try? APS(dictionary: dictionary)
-    }
-}
-
-extension UserNotification.Content: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Content {
-          attachments: [
-            \(attachments.map(\.debugDescription))
-          ]
-          badge: \(badge?.description ?? "NIL")
-          body: \(body)
-          categoryId: \(categoryId)
-          launchImageName: \(launchImageName)
-          sound: \(sound?.debugDescription ?? "NIL")
-          subtitle: \(subtitle)
-          threadIdentifier: \(threadIdentifier)
-          title: \(title)
-          payload: \(payload.debugDescription)
-        }
-        """
     }
 }
