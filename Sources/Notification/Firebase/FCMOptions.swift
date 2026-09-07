@@ -10,14 +10,6 @@ public struct FCMOptions: Hashable, Sendable, Codable {
         self.image = image
     }
 
-    public var payload: UserNotification.Payload {
-        var content = UserNotification.Payload()
-        if let image {
-            content["image"] = .string(image.absoluteString)
-        }
-        return content
-    }
-
     @available(*, deprecated)
     var userInfo: UserInfo {
         if let image {
@@ -29,5 +21,15 @@ public struct FCMOptions: Hashable, Sendable, Codable {
         } else {
             [:]
         }
+    }
+}
+
+extension FCMOptions: PayloadConvertible {
+    public var payload: Payload {
+        var content = Payload()
+        if let image {
+            content["image"] = .string(image.absoluteString)
+        }
+        return content
     }
 }

@@ -88,7 +88,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
         // Consider yielding UserNotification.Content instead of Payload…
         #if !os(tvOS)
         let userInfo = notification.request.content.userInfo
-        let payload = (try? UserNotification.Payload(userInfo: userInfo)) ?? [:]
+        let payload = (try? Payload(userInfo: userInfo)) ?? [:]
         let metadata: Logger.Metadata = [
             "payload": .dictionary(payload.metadata.redacting(keyPaths: redactions)),
         ]
@@ -104,7 +104,7 @@ extension UserNotificationManager: UNUserNotificationCenterDelegate {
     #if !os(tvOS)
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        let payload = (try? UserNotification.Payload(userInfo: userInfo)) ?? [:]
+        let payload = (try? Payload(userInfo: userInfo)) ?? [:]
 
         let action: UserNotification.Action = switch response.actionIdentifier {
         case UNNotificationDefaultActionIdentifier:

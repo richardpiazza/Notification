@@ -1,10 +1,10 @@
 public enum Traffic: Hashable, Sendable {
-    case silent(UserNotification.Payload)
-    case presented(UserNotification.Payload)
+    case silent(Payload)
+    case presented(Payload)
     #if os(tvOS)
-    case interacted(UserNotification.Payload)
+    case interacted(Payload)
     #else
-    case interacted(UserNotification.Payload, UserNotification.Action)
+    case interacted(Payload, UserNotification.Action)
     #endif
 
     @available(*, deprecated, message: "Use `UserNotification.Payload`")

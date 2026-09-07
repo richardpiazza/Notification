@@ -1,6 +1,10 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 
-public struct UserNotification {
+public struct UserNotification: Hashable, Sendable {
     public let date: Date
     public let request: Request
 

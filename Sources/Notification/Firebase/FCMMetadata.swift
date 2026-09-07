@@ -32,23 +32,6 @@ public struct FCMMetadata: Hashable, Sendable {
         self.installationId = installationId
         self.analyticsEnabled = analyticsEnabled
     }
-
-    public var payload: UserNotification.Payload {
-        var content = UserNotification.Payload()
-        if let messageId {
-            content[CodingKeys.messageId.rawValue] = .string(messageId)
-        }
-        if let senderId {
-            content[CodingKeys.senderId.rawValue] = .string(senderId)
-        }
-        if let installationId {
-            content[CodingKeys.installationId.rawValue] = .string(installationId)
-        }
-        if let analyticsEnabled {
-            content[CodingKeys.analyticsEnabled.rawValue] = .int(analyticsEnabled)
-        }
-        return content
-    }
 }
 
 extension FCMMetadata: Codable {
@@ -76,5 +59,24 @@ extension FCMMetadata: Codable {
         } catch {
             analyticsEnabled = nil
         }
+    }
+}
+
+extension FCMMetadata: PayloadConvertible {
+    public var payload: Payload {
+        var content = Payload()
+        if let messageId {
+            content[CodingKeys.messageId.rawValue] = .string(messageId)
+        }
+        if let senderId {
+            content[CodingKeys.senderId.rawValue] = .string(senderId)
+        }
+        if let installationId {
+            content[CodingKeys.installationId.rawValue] = .string(installationId)
+        }
+        if let analyticsEnabled {
+            content[CodingKeys.analyticsEnabled.rawValue] = .int(analyticsEnabled)
+        }
+        return content
     }
 }

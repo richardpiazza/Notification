@@ -55,7 +55,7 @@ open class AbstractNotificationManager: NSObject, NotificationManager {
     }
 
     public func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool {
-        let payload = try UserNotification.Payload(userInfo: userInfo)
+        let payload = try Payload(userInfo: userInfo)
         let metadata: Logger.Metadata = [
             "payload": .dictionary(payload.metadata.redacting(keyPaths: redactions)),
         ]
