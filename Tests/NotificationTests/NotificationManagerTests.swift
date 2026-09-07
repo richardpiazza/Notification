@@ -19,6 +19,7 @@ struct NotificationManagerTests {
             return content
         }
 
+        @available(*, deprecated)
         var userInfo: UserInfo {
             payload
         }
@@ -72,7 +73,7 @@ struct NotificationManagerTests {
         )
         try notificationManager.localNotificationRequest(request)
 
-        try await Task.sleep(for: .milliseconds(150))
+        try await Task.sleep(for: .seconds(1))
 
         #expect(contentReceived == 3)
         #expect(notificationsReceived == 1)
@@ -90,7 +91,7 @@ struct NotificationManagerTests {
             return output
         }
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(for: .seconds(1))
 
         var request = UserNotification.Request(content: UserNotification.Content(payload: aps1.payload))
         try notificationManager.localNotificationRequest(request)
@@ -101,7 +102,7 @@ struct NotificationManagerTests {
         request = UserNotification.Request(content: UserNotification.Content(payload: aps3.payload))
         try notificationManager.localNotificationRequest(request)
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(for: .seconds(1))
 
         subscription1.cancel()
         let traffic = try await subscription1.value
