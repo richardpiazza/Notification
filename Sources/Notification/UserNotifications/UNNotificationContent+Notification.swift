@@ -26,7 +26,7 @@ public extension UserNotification.Content {
             subtitle: notificationContent.subtitle,
             threadIdentifier: notificationContent.threadIdentifier,
             title: notificationContent.title,
-            payload: notificationContent.userInfo
+            userInfo: notificationContent.userInfo
         )
         #endif
     }
@@ -49,7 +49,7 @@ public extension UNNotificationContent {
         content.subtitle = notificationContent.subtitle
         content.threadIdentifier = notificationContent.threadIdentifier
         content.title = notificationContent.title
-        content.userInfo = notificationContent.payload
+        content.userInfo = notificationContent.userInfo
         #endif
         return content
     }

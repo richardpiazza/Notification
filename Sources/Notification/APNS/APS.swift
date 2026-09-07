@@ -51,6 +51,11 @@ public struct APS: Hashable, Sendable {
         self.category = category
         self.threadId = threadId
     }
+
+    public init(dictionary: [String: Any]) throws {
+        let data = try JSONSerialization.data(withJSONObject: dictionary)
+        self = try JSONDecoder().decode(Self.self, from: data)
+    }
 }
 
 extension APS: Codable {
@@ -86,7 +91,12 @@ extension APS: Codable {
 }
 
 public extension APS {
+    @available(*, deprecated, renamed: "userInfo")
     var payload: Payload? {
+        userInfo
+    }
+
+    var userInfo: UserInfo? {
         guard let data = try? JSONEncoder().encode(self) else {
             return nil
         }
@@ -102,7 +112,8 @@ public extension APS {
     var isSilent: Bool { contentAvailable == 1 }
 }
 
-public extension Payload {
+public extension UserInfo {
+    @available(*, deprecated)
     var aps: APS? {
         guard let dictionary = self["aps"] else {
             return nil

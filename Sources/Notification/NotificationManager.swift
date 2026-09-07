@@ -35,7 +35,7 @@ public protocol NotificationManager {
     /// will be interpreted as a `UIBackgroundFetchResult`.
     ///
     /// This can also be called at any point to propagate a notification payload through the service.
-    func didReceiveRemoteNotification(_ payload: Payload) async throws -> Bool
+    func didReceiveRemoteNotification(_ userInfo: UserInfo) async throws -> Bool
 
     /// Schedule a local notification to be presented.
     func localNotificationRequest(_ request: UserNotification.Request) throws
@@ -91,16 +91,28 @@ public extension NotificationManager {
 
         let task = Task {
             for await value in trafficStream() {
+                var notificationPayload: UserNotification.Payload
+                #if os(tvOS)
+                switch value {
+                case .silent(let payload), .interacted(let payload):
+                    notificationPayload = payload
+                default:
+                    continue
+                }
+                #else
                 switch value {
                 case .silent(let payload), .interacted(let payload, _):
-                    do {
-                        let data = try JSONSerialization.data(withJSONObject: payload)
-                        let notification = try decoder.decode(T.self, from: data)
-                        stream.continuation.yield(notification)
-                    } catch {}
+                    notificationPayload = payload
                 default:
-                    break
+                    continue
                 }
+                #endif
+
+                do {
+                    let data = try JSONSerialization.data(withJSONObject: notificationPayload.userInfo)
+                    let notification = try decoder.decode(T.self, from: data)
+                    stream.continuation.yield(notification)
+                } catch {}
             }
         }
 
@@ -117,16 +129,25 @@ public extension NotificationManager {
         trafficPublisher
             // `Payload` from '.silent' and '.interacted' only.
             .compactMap { traffic in
+                #if os(tvOS)
                 switch traffic {
-                case .silent(let payload), .interacted(let payload, _):
-                    payload
+                case .silent(let payload), .interacted(let payload):
+                    payload.userInfo
                 default:
                     nil
                 }
+                #else
+                switch traffic {
+                case .silent(let payload), .interacted(let payload, _):
+                    payload.userInfo
+                default:
+                    nil
+                }
+                #endif
             }
-            // Decode `Payload` to `T`
-            .flatMap { payload in
-                Just(payload)
+            // Decode `UserInfo` to `T`
+            .flatMap { userInfo in
+                Just(userInfo)
                     .tryMap {
                         try JSONSerialization.data(withJSONObject: $0)
                     }

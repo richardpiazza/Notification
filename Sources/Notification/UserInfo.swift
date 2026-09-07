@@ -1,8 +1,21 @@
 import Foundation
 
-public typealias Payload = [AnyHashable: Any]
+/// Represents the dictionary associated to Notification payloads.
+///
+/// Heavily influenced by `UNNotification.request.content.userInfo`.
+///
+/// From the documentation:
+/// ```
+/// The keys in this dictionary must be property-list types—that’s,
+/// they must be types that can be serialized into the property-list format.
+/// ```
+public typealias UserInfo = [AnyHashable: Any]
 
-public extension Payload {
+@available(*, deprecated, renamed: "UserInfo")
+public typealias Payload = UserInfo
+
+public extension UserInfo {
+    @available(*, deprecated)
     func json(redacting keyPaths: [String] = []) -> String {
         (try? JSONSerialization.json(withJSONObject: self, redacting: keyPaths)) ?? "{}"
     }
@@ -15,6 +28,7 @@ public extension JSONSerialization {
     ///   - object: The Dictionary<String, Any> to process
     ///   - keyPaths: The _dotted_ paths that should be redacted.
     /// - returns: A `Dictionary<String, Any>` or the original `object` if not conforming.
+    @available(*, deprecated)
     static func redact(_ object: Any, keyPathsToRedact keyPaths: [String] = []) -> Any {
         guard var dictionary = object as? [String: Any] else {
             return object
@@ -49,6 +63,7 @@ public extension JSONSerialization {
     ///   - object: The object from which to generate JSON data.
     ///   - options: Options for creating the JSON data. See `JSONSerialization.WritingOptions` for possible values.
     ///   - keyPaths: The _dotted_ paths that should be redacted.
+    @available(*, deprecated)
     static func json(
         withJSONObject object: Any,
         options: JSONSerialization.WritingOptions = [.prettyPrinted, .sortedKeys],
