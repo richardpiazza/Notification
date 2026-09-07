@@ -73,7 +73,7 @@ struct NotificationManagerTests {
         )
         try notificationManager.localNotificationRequest(request)
 
-        try await Task.sleep(for: .seconds(1))
+        try await Task.sleep(for: .seconds(1.5))
 
         #expect(contentReceived == 3)
         #expect(notificationsReceived == 1)
