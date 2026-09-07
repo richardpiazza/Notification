@@ -91,16 +91,28 @@ public extension NotificationManager {
 
         let task = Task {
             for await value in trafficStream() {
+                var notificationPayload: UserNotification.Payload
+                #if os(tvOS)
+                switch value {
+                case .silent(let payload), .interacted(let payload):
+                    notificationPayload = payload
+                default:
+                    continue
+                }
+                #else
                 switch value {
                 case .silent(let payload), .interacted(let payload, _):
-                    do {
-                        let data = try JSONSerialization.data(withJSONObject: payload.userInfo)
-                        let notification = try decoder.decode(T.self, from: data)
-                        stream.continuation.yield(notification)
-                    } catch {}
+                    notificationPayload = payload
                 default:
-                    break
+                    continue
                 }
+                #endif
+
+                do {
+                    let data = try JSONSerialization.data(withJSONObject: notificationPayload.userInfo)
+                    let notification = try decoder.decode(T.self, from: data)
+                    stream.continuation.yield(notification)
+                } catch {}
             }
         }
 
@@ -117,12 +129,21 @@ public extension NotificationManager {
         trafficPublisher
             // `Payload` from '.silent' and '.interacted' only.
             .compactMap { traffic in
+                #if os(tvOS)
+                switch traffic {
+                case .silent(let payload), .interacted(let payload):
+                    payload.userInfo
+                default:
+                    nil
+                }
+                #else
                 switch traffic {
                 case .silent(let payload), .interacted(let payload, _):
                     payload.userInfo
                 default:
                     nil
                 }
+                #endif
             }
             // Decode `UserInfo` to `T`
             .flatMap { userInfo in
