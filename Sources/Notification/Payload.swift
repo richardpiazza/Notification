@@ -28,7 +28,24 @@ public enum PayloadValue: Hashable, Sendable {
     case dictionary([String: PayloadValue])
 
     public init(_ any: Any) throws {
+        let isBool = String(describing: type(of: any)) == "__NSCFBoolean"
+        var isInt = false
+        var isFloat = false
+        #if canImport(Foundation)
+        if let nsNumber = any as? NSNumber {
+            let numberType = CFNumberGetType(nsNumber)
+            isInt = [.intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .nsIntegerType].contains(numberType)
+            isFloat = [.floatType, .float32Type, .float64Type, .cgFloatType, .doubleType].contains(numberType)
+        }
+        #endif
+
         switch any {
+        case let value as Bool where isBool:
+            self = .bool(value)
+        case let value as Double where isFloat:
+            self = .double(value)
+        case let value as Int where isInt:
+            self = .int(value)
         case let value as Bool:
             self = .bool(value)
         case let value as Data:
