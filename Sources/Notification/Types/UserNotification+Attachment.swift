@@ -1,4 +1,9 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
+import Logging
 
 public extension UserNotification {
     struct Attachment: Hashable, Sendable, Identifiable {
@@ -20,17 +25,13 @@ public extension UserNotification {
             self.url = url
             self.type = type
         }
-    }
-}
 
-extension UserNotification.Attachment: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Attachment {
-          id: \(id)
-          url: \(url.absoluteString)
-          type: \(type)
+        public var metadata: Logger.Metadata {
+            [
+                "id": .string(id),
+                "url": .stringConvertible(url),
+                "type": .string(type),
+            ]
         }
-        """
     }
 }

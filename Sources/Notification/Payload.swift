@@ -7,6 +7,16 @@ import Logging
 
 public typealias Payload = [String: PayloadValue]
 
+/// A type which can be represented as a type-safe hashable/sendable dictionary.
+public protocol PayloadConvertible {
+    var payload: Payload { get }
+}
+
+/// A type which can be initialized with a type-safe hashable/sendable dictionary.
+public protocol ExpressibleByPayload {
+    init(payload: Payload) throws
+}
+
 public enum PayloadValue: Hashable, Sendable {
     case bool(Bool)
     case data(Data)
@@ -93,14 +103,4 @@ public extension Payload {
     var metadata: Logger.Metadata {
         mapValues(\.metadataValue)
     }
-}
-
-/// A type which can be represented as a type-safe hashable/sendable dictionary.
-public protocol PayloadConvertible {
-    var payload: Payload { get }
-}
-
-/// A type which can be initialized with a type-safe hashable/sendable dictionary.
-public protocol ExpressibleByPayload {
-    init(payload: Payload) throws
 }

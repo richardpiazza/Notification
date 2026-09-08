@@ -1,3 +1,5 @@
+import Logging
+
 public extension UserNotification {
     struct Action: Hashable, Sendable, Identifiable, Codable {
         /// The unique identifier for this action.
@@ -24,19 +26,15 @@ public extension UserNotification {
             self.destructive = destructive
             self.foreground = foreground
         }
-    }
-}
 
-extension UserNotification.Action: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        """
-        UserNotification.Action {
-          id: \(id)
-          title: \(title)
-          authenticationRequired: \(authenticationRequired ? "YES" : "NO")
-          destructive: \(destructive ? "YES" : "NO")
-          foreground: \(foreground ? "YES" : "NO")
+        public var metadata: Logger.Metadata {
+            [
+                "id": .string(id),
+                "title": .string(title),
+                "authenticationRequired": .stringConvertible(authenticationRequired),
+                "destructive": .stringConvertible(destructive),
+                "foreground": .stringConvertible(foreground),
+            ]
         }
-        """
     }
 }
