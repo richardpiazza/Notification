@@ -1,4 +1,8 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 
 /// A dictionary FCM uses to pass features like the image URL. Your extension intercepts this payload,
 /// reads userInfo["fcm_options"]["image"], downloads the image, and attaches it before iOS displays
