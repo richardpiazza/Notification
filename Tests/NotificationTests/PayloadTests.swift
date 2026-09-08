@@ -1,3 +1,6 @@
+#if canImport(Foundation)
+import Foundation
+#endif
 @testable import Notification
 import Testing
 
@@ -57,5 +60,32 @@ struct PayloadTests {
             "document_id": .string("doc_8675309"),
             "shared_by_user_id": .string("usr_123"),
         ])
+    }
+
+    @Test func mixedValues() throws {
+        let result: Payload = [
+            "bool": .bool(false),
+            "int": .int(3),
+            "double": .double(3.33),
+        ]
+
+        var userInfo: UserInfo = [
+            "bool": false,
+            "int": 3,
+            "double": 3.33,
+        ]
+
+        var payload = try Payload(userInfo: userInfo)
+        #expect(payload == result)
+
+        #if canImport(ObjectiveC)
+        userInfo["bool"] = NSNumber(booleanLiteral: false)
+        payload = try Payload(userInfo: userInfo)
+        #expect(payload == result)
+
+        userInfo["int"] = NSNumber(integerLiteral: 3)
+        payload = try Payload(userInfo: userInfo)
+        #expect(payload == result)
+        #endif
     }
 }
