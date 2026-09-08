@@ -20,9 +20,24 @@ public extension UserNotification {
         case dictionary([String: PayloadValue])
 
         public init(_ any: Any) throws {
+            let isBool = String(describing: type(of: any)) == "__NSCFBoolean"
+            var isInt = false
+            var isFloat = false
+            #if canImport(ObjectiveC)
+            if let nsNumber = any as? NSNumber {
+                let numberType = CFNumberGetType(nsNumber)
+                isInt = [CFNumberType.intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .nsIntegerType].contains(numberType)
+                isFloat = [CFNumberType.floatType, .float32Type, .float64Type, .cgFloatType, .doubleType].contains(numberType)
+            }
+            #endif
+
             switch any {
-            case let value as Bool:
+            case let value as Bool where isBool:
                 self = .bool(value)
+            case let value as Double where isFloat:
+                self = .double(value)
+            case let value as Int where isInt:
+                self = .int(value)
             case let value as Data:
                 self = .data(value)
             case let value as Date:
@@ -31,6 +46,8 @@ public extension UserNotification {
                 self = .double(value)
             case let value as Int:
                 self = .int(value)
+            case let value as Bool:
+                self = .bool(value)
             case let value as String:
                 self = .string(value)
             case let value as [Any]:
