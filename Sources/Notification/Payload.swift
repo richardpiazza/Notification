@@ -31,11 +31,11 @@ public enum PayloadValue: Hashable, Sendable {
         let isBool = String(describing: type(of: any)) == "__NSCFBoolean"
         var isInt = false
         var isFloat = false
-        #if canImport(Foundation)
+        #if canImport(ObjectiveC)
         if let nsNumber = any as? NSNumber {
             let numberType = CFNumberGetType(nsNumber)
-            isInt = [.intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .nsIntegerType].contains(numberType)
-            isFloat = [.floatType, .float32Type, .float64Type, .cgFloatType, .doubleType].contains(numberType)
+            isInt = [CFNumberType.intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type, .nsIntegerType].contains(numberType)
+            isFloat = [CFNumberType.floatType, .float32Type, .float64Type, .cgFloatType, .doubleType].contains(numberType)
         }
         #endif
 

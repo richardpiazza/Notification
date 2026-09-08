@@ -70,15 +70,15 @@ struct PayloadTests {
         ]
 
         var userInfo: UserInfo = [
-            "bool" : false,
-            "int" : 3,
-            "double" : 3.33,
+            "bool": false,
+            "int": 3,
+            "double": 3.33,
         ]
 
         var payload = try Payload(userInfo: userInfo)
         #expect(payload == result)
 
-        #if canImport(Foundation)
+        #if canImport(ObjectiveC)
         userInfo["bool"] = NSNumber(booleanLiteral: false)
         payload = try Payload(userInfo: userInfo)
         #expect(payload == result)
