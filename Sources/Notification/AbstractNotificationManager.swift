@@ -9,13 +9,19 @@ import Logging
 open class AbstractNotificationManager: NSObject, NotificationManager {
 
     #if canImport(Combine)
+    @available(*, deprecated)
     public let authorizationSubject: CurrentValueSubject<AuthorizationStatus, Never>
+    @available(*, deprecated)
     public var authorizationPublisher: AnyPublisher<AuthorizationStatus, Never> { authorizationSubject.eraseToAnyPublisher() }
 
+    @available(*, deprecated)
     public let apnsTokenSubject: CurrentValueSubject<Data?, Never> = .init(nil)
+    @available(*, deprecated)
     public var apnsTokenPublisher: AnyPublisher<Data?, Never> { apnsTokenSubject.eraseToAnyPublisher() }
 
+    @available(*, deprecated)
     public let trafficSubject: PassthroughSubject<Traffic, Never> = PassthroughSubject()
+    @available(*, deprecated)
     public var trafficPublisher: AnyPublisher<Traffic, Never> { trafficSubject.eraseToAnyPublisher() }
     #endif
 
